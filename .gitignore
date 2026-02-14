@@ -1,41 +1,78 @@
-# Prerequisites
-*.d
+# ========================
+# Build folders
+# ========================
+build/
+cmake-build-*/
+android-build-*/
 
-# Compiled Object files
-*.slo
-*.lo
+# ========================
+# Qt Creator
+# ========================
+*.pro.user
+*.pro.user.*
+*.pri.user
+*.qbs.user
+*.qmlproject.user
+CMakeLists.txt.user
+*.autosave
+*.creator
+*.creator.user
+*.creator.user.*
+
+# ========================
+# CMake
+# ========================
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+install_manifest.txt
+compile_commands.json
+*.cmake
+
+# ========================
+# Ninja
+# ========================
+.ninja_deps
+.ninja_log
+build.ninja
+
+# ========================
+# Android
+# ========================
+android-build/
+android/
+local.properties
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+
+# ========================
+# Compiled Objects
+# ========================
 *.o
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
+*.lo
+*.slo
 *.a
 *.lib
-
-# Executables
+*.dll
+*.so
+*.dylib
 *.exe
 *.out
 *.app
 
-# debug information files
+# ========================
+# Debug / Profiling
+# ========================
+*.pdb
 *.dwo
+*.ilk
+
+# ========================
+# OS files
+# ========================
+.DS_Store
+Thumbs.db
