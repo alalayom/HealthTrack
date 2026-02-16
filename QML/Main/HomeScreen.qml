@@ -28,7 +28,7 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            contentStack.replace("Statistics.qml")
+                            contentStack.replace("../Statistics/StatisticsMain.qml")
                         }
                     }
 
@@ -50,7 +50,7 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            contentStack.replace("Settings.qml")
+                            contentStack.replace("../Settings/SettingsMain.qml")
                         }
                     }
 
@@ -94,10 +94,10 @@ Item {
 
                 Repeater {
                     model: [
-                        {text: "Nutrition", page: "Nutrition.qml"},
-                        {text: "Sport", page: "Sport.qml"},
-                        {text: "Sleep", page: "Sleep.qml"},
-                        {text: "Profile", page: "Profile.qml"}
+                        {text: "Nutrition", page: "../Nutrition/NutritionMain.qml"},
+                        {text: "Sport", page: "../Sport/SportMain.qml"},
+                        {text: "Sleep", page: "../Sleep/SleepMain.qml"},
+                        {text: "Profile", page: "../Profile/ProfileMain.qml"}
                     ]
 
                     delegate: Rectangle {

@@ -23,15 +23,21 @@ qt_add_qml_module(appHealthTrack
     URI HealthTrack
     VERSION 1.0
     QML_FILES
-        Main.qml
-        QML_FILES LoginPage.qml
-        QML_FILES HomeScreen.qml
-        QML_FILES Nutrition.qml
-        QML_FILES Sport.qml
-        QML_FILES Sleep.qml
-        QML_FILES Profile.qml
-        QML_FILES Settings.qml
-        QML_FILES Statistics.qml
+        QML/Main/Main.qml
+        QML/Main/LoginPage.qml
+        QML/Main/HomeScreen.qml
+
+        QML/Nutrition/NutritionMain.qml
+
+        QML/Sport/SportMain.qml
+
+        QML/Sleep/SleepMain.qml
+
+        QML/Profile/ProfileMain.qml
+
+        QML/Settings/SettingsMain.qml
+
+        QML/Statistics/StatisticsMain.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
