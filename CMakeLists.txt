@@ -38,6 +38,49 @@ qt_add_qml_module(appHealthTrack
         QML/Settings/SettingsMain.qml
 
         QML/Statistics/StatisticsMain.qml
+
+        SOURCES src/core/databasemanager.h src/core/databasemanager.cpp
+        SOURCES src/core/appsettingsmanager.h src/core/appsettingsmanager.cpp
+        SOURCES src/core/dateutils.h src/core/dateutils.cpp
+        SOURCES src/core/unitconverter.h src/core/unitconverter.cpp
+
+        SOURCES src/features/nutrition/foodentry.h src/features/nutrition/foodentry.cpp
+        SOURCES src/features/nutrition/mealentry.h src/features/nutrition/mealentry.cpp
+        SOURCES src/features/nutrition/dailyentry.h src/features/nutrition/dailyentry.cpp
+        SOURCES src/features/nutrition/nutritionrepository.h src/features/nutrition/nutritionrepository.cpp
+        SOURCES src/features/nutrition/nutritionservice.h src/features/nutrition/nutritionservice.cpp
+        SOURCES src/features/nutrition/nutritionviewmodel.h src/features/nutrition/nutritionviewmodel.cpp
+
+        SOURCES src/features/sport/exerciseentry.h src/features/sport/exerciseentry.cpp
+        SOURCES src/features/sport/workoutentry.h src/features/sport/workoutentry.cpp
+        SOURCES src/features/sport/sportrepository.h src/features/sport/sportrepository.cpp
+        SOURCES src/features/sport/sportservice.h src/features/sport/sportservice.cpp
+        SOURCES src/features/sport/sportviewmodel.h src/features/sport/sportviewmodel.cpp
+
+        SOURCES src/features/sleep/sleepentry.h src/features/sleep/sleepentry.cpp
+        SOURCES src/features/sleep/sleeprepository.h src/features/sleep/sleeprepository.cpp
+        SOURCES src/features/sleep/sleepservice.h src/features/sleep/sleepservice.cpp
+        SOURCES src/features/sleep/sleepviewmodel.h src/features/sleep/sleepviewmodel.cpp
+
+        SOURCES src/features/hydration/waterentry.h src/features/hydration/waterentry.cpp
+        SOURCES src/features/hydration/waterrepository.h src/features/hydration/waterrepository.cpp
+        SOURCES src/features/hydration/waterservice.h src/features/hydration/waterservice.cpp
+        SOURCES src/features/hydration/waterviewmodel.h src/features/hydration/waterviewmodel.cpp
+
+        SOURCES src/features/profile/userprofile.h src/features/profile/userprofile.cpp
+        SOURCES src/features/profile/profilerepository.h src/features/profile/profilerepository.cpp
+        SOURCES src/features/profile/profileservice.h src/features/profile/profileservice.cpp
+        SOURCES src/features/profile/profileviewmodel.h src/features/profile/profileviewmodel.cpp
+
+        SOURCES src/features/settings/settingsviewmodel.h src/features/settings/settingsviewmodel.cpp
+
+        SOURCES src/features/statistics/statisticsservice.h src/features/statistics/statisticsservice.cpp
+        SOURCES src/features/statistics/statisticsviewmodel.h src/features/statistics/statisticsviewmodel.cpp
+        SOURCES src/features/statistics/statisticsrepository.h src/features/statistics/statisticsrepository.cpp
+
+        SOURCES src/app/appcontroller.h src/app/appcontroller.cpp
+        SOURCES src/app/navigationmanager.h src/app/navigationmanager.cpp
+        SOURCES src/app/appstate.h src/app/appstate.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
