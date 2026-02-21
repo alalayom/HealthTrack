@@ -1,10 +1,20 @@
 #ifndef DATABASEMANAGER_H
 #define DATABASEMANAGER_H
 
+#include <QtSql/QSqlDatabase>
+
 class DatabaseManager
 {
 public:
+    static bool initialize();
+    static QSqlDatabase database();
+
     DatabaseManager();
+
+private:
+    static bool openDatabase();
+    static bool configureDatabase();
+    static bool createTables();
 };
 
 #endif // DATABASEMANAGER_H

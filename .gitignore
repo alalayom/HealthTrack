@@ -76,3 +76,22 @@ gradlew.bat
 # ========================
 .DS_Store
 Thumbs.db
+
+# ========================
+# Local debug scripts
+# ========================
+*.bat
+
+# ========================
+# SQLite databases (Android debug pulls)
+# ========================
+*.db
+*.db-shm
+*.db-wal
+
+# ========================
+# Generated DB copies
+# ========================
+healthtrack_*.db
+healthtrack_*.db-shm
+healthtrack_*.db-wal
