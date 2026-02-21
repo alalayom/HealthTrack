@@ -1,10 +1,35 @@
 #ifndef DAILYENTRY_H
 #define DAILYENTRY_H
 
+#include <QDate>
+
+#include "mealentry.h"
+
 class DailyEntry
 {
 public:
     DailyEntry();
+    explicit DailyEntry(QDate pDate);
+
+    ~DailyEntry();
+
+    const QDate& getDate() const noexcept;
+    const QList<MealEntry>& getMeals() const noexcept;
+
+    void setDate(QDate pDate);
+
+    void addMeal(MealEntry pMeal);
+    void removeMeal(int pIndex);
+    void clearMeals() noexcept;
+
+    double totalCalories() const noexcept;
+    double totalProtein() const noexcept;
+    double totalCarbs() const noexcept;
+    double totalFat() const noexcept;
+
+private:
+    QDate mDate;
+    QList<MealEntry> mMeals;
 };
 
 #endif // DAILYENTRY_H
