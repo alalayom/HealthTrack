@@ -90,5 +90,3 @@ double DailyEntry::totalFat() const noexcept
 
     return tSum;
 }
-
-
