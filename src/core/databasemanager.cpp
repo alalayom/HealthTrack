@@ -38,6 +38,32 @@ QSqlDatabase DatabaseManager::database()
     return QSqlDatabase::database(CONNECTION_NAME);
 }
 
+QSqlDatabase DatabaseManager::connection() const
+{
+    return QSqlDatabase::database(CONNECTION_NAME);
+}
+
+bool DatabaseManager::execute(const QString &pSql)
+{
+    QSqlQuery tQuery(connection());
+    return tQuery.exec(pSql);
+}
+
+bool DatabaseManager::beginTransaction()
+{
+    return connection().transaction();
+}
+
+bool DatabaseManager::commit()
+{
+    return connection().commit();
+}
+
+bool DatabaseManager::rollback()
+{
+    return connection().rollback();
+}
+
 bool DatabaseManager::openDatabase()
 {
     if(QSqlDatabase::contains(CONNECTION_NAME))
@@ -90,15 +116,45 @@ bool DatabaseManager::createTables()
 {
     QSqlQuery query(database());
 
+    //Daily_entries table
     if(!query.exec(R"(
-        CREATE TABLE IF NOT EXISTS food_entries (
+        CREATE TABLE IF NOT EXISTS daily_entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE,
-            calories_per_100g REAL NOT NULL,
-            protein_per_100g REAL NOT NULL,
-            carbs_per100g REAL NOT NULL,
-            fat_per_100g REAL NOT NULL
-        ))"))
+            date TEXT NOT NULL UNIQUE
+        )
+    )"))
+    {
+        qCritical() << query.lastError().text();
+        return false;
+    }
+
+    //Meal_entries table
+    if(!query.exec(R"(
+        CREATE TABLE IF NOT EXISTS meal_entries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            daily_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            FOREIGN KEY(daily_id) REFERENCES daily_entries(id) ON DELETE CASCADE
+        )
+    )"))
+    {
+        qCritical() << query.lastError().text();
+        return false;
+    }
+
+    //Food_entries table
+    if(!query.exec(R"(
+        CREATE TABLE IF NOT EXISTS foods (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            meal_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            calories REAL NOT NULL,
+            protein REAL NOT NULL,
+            carbs REAL NOT NULL,
+            fat REAL NOT NULL,
+            FOREIGN KEY(meal_id) REFERENCES meal_entries(id) OM DELETE CASCADE
+        )
+    )"))
     {
         qCritical() << query.lastError().text();
         return false;

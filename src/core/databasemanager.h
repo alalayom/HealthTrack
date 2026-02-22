@@ -11,6 +11,12 @@ public:
 
     DatabaseManager();
 
+    QSqlDatabase connection() const;
+    bool execute(const QString& pSql);
+    bool beginTransaction();
+    bool commit();
+    bool rollback();
+
 private:
     static bool openDatabase();
     static bool configureDatabase();
