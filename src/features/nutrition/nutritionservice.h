@@ -19,7 +19,7 @@ public:
 
     const DailyEntry& dailyEntry() const noexcept;
 
-    QDate date() const noexcept;
+    QDate getDate() const noexcept;
     void setDate(const QDate& pDate);
 
     int mealCount() const noexcept;

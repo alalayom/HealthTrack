@@ -13,7 +13,7 @@ const DailyEntry &NutritionService::dailyEntry() const noexcept
     return mDaily;
 }
 
-QDate NutritionService::date() const noexcept
+QDate NutritionService::getDate() const noexcept
 {
     return mDaily.getDate();
 }
