@@ -17,6 +17,8 @@ public:
     bool commit();
     bool rollback();
 
+    static bool deleteTablesForTest();
+
 private:
     static bool openDatabase();
     static bool configureDatabase();

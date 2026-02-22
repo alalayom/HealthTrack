@@ -21,6 +21,10 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    //DEVELOPER STAGE ONLY, DELETE BEFORE RELEASE
+    DatabaseManager::deleteTablesForTest();
+    DatabaseManager::initialize();
+
     //Application engine
     QQmlApplicationEngine engine;
     QObject::connect(

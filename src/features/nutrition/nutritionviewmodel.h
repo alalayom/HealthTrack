@@ -13,7 +13,7 @@ class NutritionViewModel final : public QObject
     Q_OBJECT
 
     Q_PROPERTY(QDate date READ getDate WRITE setDate NOTIFY dateChanged FINAL)
-    Q_PROPERTY(QVariantList meals READ getMeals WRITE setMeals NOTIFY mealsChanged FINAL)
+    Q_PROPERTY(QVariantList meals READ getMeals NOTIFY mealsChanged FINAL)
 
     Q_PROPERTY(double totalCalories READ getTotalCalories NOTIFY totalCaloriesChanged FINAL)
     Q_PROPERTY(double totalProtein READ getTotalProtein NOTIFY totalProteinChanged FINAL)

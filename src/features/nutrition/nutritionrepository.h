@@ -10,7 +10,7 @@
 class NutritionRepository final
 {
 public:
-    explicit NutritionRepository(DatabaseManager* pDatabaseManager);
+    explicit NutritionRepository();
     ~NutritionRepository() = default;
 
     bool saveDailyEntry(const DailyEntry& pEntry);
@@ -22,7 +22,6 @@ private:
     int insertMeal(int pDailyId, const MealEntry& pMeal);
     bool insertFood(int pMealId, const FoodEntry& pFood);
 
-    DatabaseManager* mDatabaseManager;
 };
 
 #endif // NUTRITIONREPOSITORY_H

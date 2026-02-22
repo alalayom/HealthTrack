@@ -64,6 +64,52 @@ bool DatabaseManager::rollback()
     return connection().rollback();
 }
 
+bool DatabaseManager::deleteTablesForTest()
+{
+    QSqlDatabase tDatabase = database();
+    if(!tDatabase.isOpen())
+    {
+        return false;
+    }
+
+    QSqlQuery tQuery(tDatabase);
+
+    //close foreign key constraints for temporary testing
+    if(!tQuery.exec("PRAGMA foreign_keys = OFF;"))
+    {
+        return false;
+    }
+
+    if(!tQuery.exec("DROP TABLE IF EXISTS foods;"))
+    {
+        return false;
+    }
+
+    if(!tQuery.exec("DROP TABLE IF EXISTS food_entries;"))
+    {
+        return false;
+    }
+
+    if(!tQuery.exec("DROP TABLE IF EXISTS meal_entries;"))
+    {
+        return false;
+    }
+
+    if(!tQuery.exec("DROP TABLE IF EXISTS daily_entries;"))
+    {
+        return false;
+    }
+
+    if(!tQuery.exec("PRAGMA foreign_keys = ON;"))
+    {
+        return false;
+    }
+
+    qDebug() << "All nutrition tables deleted (DEV MODE).";
+
+    return true;
+}
+
 bool DatabaseManager::openDatabase()
 {
     if(QSqlDatabase::contains(CONNECTION_NAME))
@@ -144,7 +190,7 @@ bool DatabaseManager::createTables()
 
     //Food_entries table
     if(!query.exec(R"(
-        CREATE TABLE IF NOT EXISTS foods (
+        CREATE TABLE IF NOT EXISTS food_entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             meal_id INTEGER NOT NULL,
             name TEXT NOT NULL,
@@ -152,7 +198,7 @@ bool DatabaseManager::createTables()
             protein REAL NOT NULL,
             carbs REAL NOT NULL,
             fat REAL NOT NULL,
-            FOREIGN KEY(meal_id) REFERENCES meal_entries(id) OM DELETE CASCADE
+            FOREIGN KEY(meal_id) REFERENCES meal_entries(id) ON DELETE CASCADE
         )
     )"))
     {

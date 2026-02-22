@@ -5,15 +5,14 @@
 #include <QVariant>
 #include <QDebug>
 
-NutritionRepository::NutritionRepository(DatabaseManager* pDatabaseManager)
-    : mDatabaseManager(pDatabaseManager)
+NutritionRepository::NutritionRepository()
 {
 
 }
 
 bool NutritionRepository::saveDailyEntry(const DailyEntry& pEntry)
 {
-    if(!mDatabaseManager->beginTransaction())
+    if(!DatabaseManager::database().transaction())
     {
         return false;
     }
@@ -21,18 +20,18 @@ bool NutritionRepository::saveDailyEntry(const DailyEntry& pEntry)
     int tDailyId = ensureDailyId(pEntry.getDate());
     if(tDailyId <= 0)
     {
-        mDatabaseManager->rollback();
+        DatabaseManager::database().rollback();
         return false;
     }
 
     //Delete old meals and foods
-    QSqlQuery tDeleteMeals(mDatabaseManager->connection());
+    QSqlQuery tDeleteMeals(DatabaseManager::database());
     tDeleteMeals.prepare("DELETE FROM meal_entries WHERE daily_id = ?");
     tDeleteMeals.addBindValue(tDailyId);
 
     if(!tDeleteMeals.exec())
     {
-        mDatabaseManager->rollback();
+        DatabaseManager::database().rollback();
         return false;
     }
 
@@ -42,7 +41,7 @@ bool NutritionRepository::saveDailyEntry(const DailyEntry& pEntry)
         int tMealId = insertMeal(tDailyId, tMeal);
         if(tMealId <= 0)
         {
-            mDatabaseManager->rollback();
+            DatabaseManager::database().rollback();
             return false;
         }
 
@@ -50,19 +49,19 @@ bool NutritionRepository::saveDailyEntry(const DailyEntry& pEntry)
         {
             if(!insertFood(tMealId, tFood))
             {
-                mDatabaseManager->rollback();
+                DatabaseManager::database().rollback();
                 return false;
             }
         }
     }
 
-    return mDatabaseManager->commit();
+    return DatabaseManager::database().commit();
 }
 
 DailyEntry NutritionRepository::loadDailyEntry(const QDate& pDate)
 {
     DailyEntry tEntry(pDate);
-    QSqlQuery tDailyQuery(mDatabaseManager->connection());
+    QSqlQuery tDailyQuery(DatabaseManager::database());
     tDailyQuery.prepare("SELECT id FROM daily_entries WHERE date = ?");
     tDailyQuery.addBindValue(pDate.toString(Qt::ISODate));
 
@@ -72,7 +71,7 @@ DailyEntry NutritionRepository::loadDailyEntry(const QDate& pDate)
     }
 
     int tDailyId = tDailyQuery.value(0).toInt();
-    QSqlQuery tMealQuery(mDatabaseManager->connection());
+    QSqlQuery tMealQuery(DatabaseManager::database());
     tMealQuery.prepare("SELECT id, name FROM meal_entries WHERE daily_id = ?");
     tMealQuery.addBindValue(tDailyId);
 
@@ -87,7 +86,7 @@ DailyEntry NutritionRepository::loadDailyEntry(const QDate& pDate)
         QString tMealName = tMealQuery.value(1).toString();
         MealEntry tMeal(tMealName);
 
-        QSqlQuery tFoodQuery(mDatabaseManager->connection());
+        QSqlQuery tFoodQuery(DatabaseManager::database());
         tFoodQuery.prepare("SELECT name, calories, protein, carbs, fat FROM food_entries WHERE meal_id = ?");
         tFoodQuery.addBindValue(tMealId);
 
@@ -113,7 +112,7 @@ DailyEntry NutritionRepository::loadDailyEntry(const QDate& pDate)
 
 bool NutritionRepository::deleteDailyEntry(const QDate& pDate)
 {
-    QSqlQuery tQuery(mDatabaseManager->connection());
+    QSqlQuery tQuery(DatabaseManager::database());
     tQuery.prepare("DELETE FROM daily_entries WHERE date = ?");
     tQuery.addBindValue(pDate.toString(Qt::ISODate));
     return tQuery.exec();
@@ -121,7 +120,7 @@ bool NutritionRepository::deleteDailyEntry(const QDate& pDate)
 
 int NutritionRepository::ensureDailyId(const QDate& pDate)
 {
-    QSqlQuery tQuery(mDatabaseManager->connection());
+    QSqlQuery tQuery(DatabaseManager::database());
     tQuery.prepare("SELECT id FROM daily_entries WHERE date = ?");
     tQuery.addBindValue(pDate.toString(Qt::ISODate));
 
@@ -143,7 +142,7 @@ int NutritionRepository::ensureDailyId(const QDate& pDate)
 
 int NutritionRepository::insertMeal(int pDailyId, const MealEntry& pMeal)
 {
-    QSqlQuery tQuery(mDatabaseManager->connection());
+    QSqlQuery tQuery(DatabaseManager::database());
     tQuery.prepare("INSERT INTO meal_entries(daily_id, name) VALUES(?, ?)");
     tQuery.addBindValue(pDailyId);
     tQuery.addBindValue(pMeal.getMealName());
@@ -158,7 +157,7 @@ int NutritionRepository::insertMeal(int pDailyId, const MealEntry& pMeal)
 
 bool NutritionRepository::insertFood(int pMealId, const FoodEntry& pFood)
 {
-    QSqlQuery tQuery(mDatabaseManager->connection());
+    QSqlQuery tQuery(DatabaseManager::database());
     tQuery.prepare(R"(
         INSERT INTO food_entries(meal_id, name, calories, protein, carbs, fat)
         VALUES(?, ?, ?, ?, ?, ?)
