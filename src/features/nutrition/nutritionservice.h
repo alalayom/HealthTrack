@@ -10,12 +10,15 @@
 #include "mealentry.h"
 #include "foodentry.h"
 
+#include "../../core/databasemanager.h"
+#include "nutritionrepository.h"
+
 class NutritionService final : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit NutritionService(QObject* pParent = nullptr);
+    explicit NutritionService(DatabaseManager* pDatabaseManager, QObject* pParent = nullptr);
 
     const DailyEntry& dailyEntry() const noexcept;
 
@@ -49,6 +52,8 @@ signals:
 private:
     static QVariantMap foodToVariant(const FoodEntry& pFood);
     static QVariantMap mealToVariant(const MealEntry& pMeal);
+    DatabaseManager* mDatabaseManager = nullptr;
+    NutritionRepository mRepository;
     DailyEntry mDaily;
 };
 

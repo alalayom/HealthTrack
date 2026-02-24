@@ -1,85 +1,84 @@
 #include "nutritionviewmodel.h"
 
-#include <utility>
-
-NutritionViewModel::NutritionViewModel(QObject *pParent)
+NutritionViewModel::NutritionViewModel(NutritionService* pService, QObject *pParent)
     : QObject(pParent)
-    , mService(this)
+    , mService(pService)
 {
+    Q_ASSERT(mService);
     wireSignals();
 }
 
 QDate NutritionViewModel::getDate() const
 {
-    return mService.getDate();
+    return mService->getDate();
 }
 
 void NutritionViewModel::setDate(const QDate &pDate)
 {
-    mService.setDate(pDate);
+    mService->setDate(pDate);
 }
 
 QVariantList NutritionViewModel::getMeals() const
 {
-    return mService.mealsAsVariantList();
+    return mService->mealsAsVariantList();
 }
 
 double NutritionViewModel::getTotalCalories() const
 {
-    return mService.totalCalories();
+    return mService->totalCalories();
 }
 
 double NutritionViewModel::getTotalProtein() const
 {
-    return mService.totalProtein();
+    return mService->totalProtein();
 }
 
 double NutritionViewModel::getTotalCarbs() const
 {
-    return mService.totalCarbs();
+    return mService->totalCarbs();
 }
 
 double NutritionViewModel::getTotalFat() const
 {
-    return mService.totalFat();
+    return mService->totalFat();
 }
 
 void NutritionViewModel::addMeal(const QString &pMealName)
 {
-    mService.addMeal(pMealName);
+    mService->addMeal(pMealName);
 }
 
 void NutritionViewModel::removeMeal(int pMealIndex)
 {
-    mService.removeMeal(pMealIndex);
+    mService->removeMeal(pMealIndex);
 }
 
 void NutritionViewModel::clearMeals()
 {
-    mService.clearMeals();
+    mService->clearMeals();
 }
 
 void NutritionViewModel::addFood(int pMealIndex, const QString &pName, double pCalories, double pProtein, double pCarbs, double pFat)
 {
-    mService.addFood(pMealIndex, pName, pCalories, pProtein, pCarbs, pFat);
+    mService->addFood(pMealIndex, pName, pCalories, pProtein, pCarbs, pFat);
 }
 
 void NutritionViewModel::removeFood(int pMealIndex, int pFoodIndex)
 {
-    mService.removeFood(pMealIndex, pFoodIndex);
+    mService->removeFood(pMealIndex, pFoodIndex);
 }
 
 void NutritionViewModel::clearFoods(int pMealIndex)
 {
-    mService.clearFoods(pMealIndex);
+    mService->clearFoods(pMealIndex);
 }
 
 void NutritionViewModel::wireSignals()
 {
-    connect(&mService, &NutritionService::dateChanged, this, &NutritionViewModel::dateChanged);
-    connect(&mService, &NutritionService::mealsChanged, this, &NutritionViewModel::mealsChanged);
-    connect(&mService, &NutritionService::totalsChanged, this, &NutritionViewModel::totalCaloriesChanged);
-    connect(&mService, &NutritionService::totalsChanged, this, &NutritionViewModel::totalProteinChanged);
-    connect(&mService, &NutritionService::totalsChanged, this, &NutritionViewModel::totalCarbsChanged);
-    connect(&mService, &NutritionService::totalsChanged, this, &NutritionViewModel::totalFatChanged);
+    connect(mService, &NutritionService::dateChanged, this, &NutritionViewModel::dateChanged);
+    connect(mService, &NutritionService::mealsChanged, this, &NutritionViewModel::mealsChanged);
+    connect(mService, &NutritionService::totalsChanged, this, &NutritionViewModel::totalCaloriesChanged);
+    connect(mService, &NutritionService::totalsChanged, this, &NutritionViewModel::totalProteinChanged);
+    connect(mService, &NutritionService::totalsChanged, this, &NutritionViewModel::totalCarbsChanged);
+    connect(mService, &NutritionService::totalsChanged, this, &NutritionViewModel::totalFatChanged);
 }

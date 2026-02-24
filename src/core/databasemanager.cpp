@@ -114,42 +114,46 @@ bool DatabaseManager::openDatabase()
 {
     if(QSqlDatabase::contains(CONNECTION_NAME))
     {
-        return true;
+        QSqlDatabase tDb = QSqlDatabase::database(CONNECTION_NAME);
+        if(tDb.isOpen())
+        {
+            return true;
+        }
     }
 
-    QString path =QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QDir().mkpath(path);
-    QString dbPath = path + "/healthtrack.db";
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", CONNECTION_NAME);
-    db.setDatabaseName(dbPath);
+    QString tPath =QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(tPath);
+    QString tDbPath = tPath + "/healthtrack.db";
+    QSqlDatabase tDb = QSqlDatabase::addDatabase("QSQLITE", CONNECTION_NAME);
+    tDb.setDatabaseName(tDbPath);
 
-    if(!db.open())
+    if(!tDb.open())
     {
-        qCritical() << "Database open error:" << db.lastError().text();
+        qCritical() << "Database open error:" << tDb.lastError().text();
         return false;
     }
 
-    qDebug() << "Database path:" << dbPath;
+    qDebug() << "Database path:" << tDbPath;
     return true;
 }
 
 bool DatabaseManager::configureDatabase()
 {
-    QSqlQuery query(database());
+    QSqlQuery tQuery(database());
 
-    if(!query.exec("PRAGMA foreign_keys = ON;"))
+    if(!tQuery.exec("PRAGMA foreign_keys = ON;"))
     {
         qCritical() << "Failed to enable foreign keys.";
         return false;
     }
 
-    if(!query.exec("PRAGMA journal_mode = WAL;"))
+    if(!tQuery.exec("PRAGMA journal_mode = WAL;"))
     {
         qCritical() << "Failed to enable WAL mode";
         return false;
     }
 
-    if(!query.exec("PRAGMA synchronous = NORMAL;"))
+    if(!tQuery.exec("PRAGMA synchronous = NORMAL;"))
     {
         qCritical() << "Failed to set synchronous mode";
         return false;
@@ -160,22 +164,22 @@ bool DatabaseManager::configureDatabase()
 
 bool DatabaseManager::createTables()
 {
-    QSqlQuery query(database());
+    QSqlQuery tQuery(database());
 
     //Daily_entries table
-    if(!query.exec(R"(
+    if(!tQuery.exec(R"(
         CREATE TABLE IF NOT EXISTS daily_entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date TEXT NOT NULL UNIQUE
         )
     )"))
     {
-        qCritical() << query.lastError().text();
+        qCritical() << tQuery.lastError().text();
         return false;
     }
 
     //Meal_entries table
-    if(!query.exec(R"(
+    if(!tQuery.exec(R"(
         CREATE TABLE IF NOT EXISTS meal_entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             daily_id INTEGER NOT NULL,
@@ -184,12 +188,12 @@ bool DatabaseManager::createTables()
         )
     )"))
     {
-        qCritical() << query.lastError().text();
+        qCritical() << tQuery.lastError().text();
         return false;
     }
 
     //Food_entries table
-    if(!query.exec(R"(
+    if(!tQuery.exec(R"(
         CREATE TABLE IF NOT EXISTS food_entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             meal_id INTEGER NOT NULL,
@@ -202,7 +206,26 @@ bool DatabaseManager::createTables()
         )
     )"))
     {
-        qCritical() << query.lastError().text();
+        qCritical() << tQuery.lastError().text();
+        return false;
+    }
+
+    //Indexes for foreign keys
+    if(!tQuery.exec(R"(
+        CREATE INDEX IF NOT EXISTS idx_meal_daily_id
+        ON meal_entries(daily_id)
+    )"))
+    {
+        qCritical() << "Failed to create idx_meal_daily_id:" << tQuery.lastError().text();
+        return false;
+    }
+
+    if(!tQuery.exec(R"(
+        CREATE INDEX IF NOT EXISTS idx_food_meal_id
+        ON food_entries(meal_id)
+    )"))
+    {
+        qCritical() << "Failed to create idx_food_meal_id:" << tQuery.lastError().text();
         return false;
     }
 

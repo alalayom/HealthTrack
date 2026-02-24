@@ -90,3 +90,13 @@ double DailyEntry::totalFat() const noexcept
 
     return tSum;
 }
+
+MealEntry &DailyEntry::mealRef(int pIndex)
+{
+    return mMeals[pIndex];
+}
+
+const MealEntry &DailyEntry::mealRef(int pIndex) const
+{
+    return mMeals[pIndex];
+}

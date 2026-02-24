@@ -27,6 +27,9 @@ public:
     double totalCarbs() const noexcept;
     double totalFat() const noexcept;
 
+    MealEntry& mealRef(int pIndex);
+    const MealEntry& mealRef(int pIndex) const;
+
 private:
     QDate mDate;
     QList<MealEntry> mMeals;

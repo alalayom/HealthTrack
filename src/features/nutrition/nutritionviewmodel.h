@@ -22,7 +22,7 @@ class NutritionViewModel final : public QObject
 
 
 public:
-    explicit NutritionViewModel(QObject* pParent = nullptr);
+    explicit NutritionViewModel(NutritionService* pService, QObject* pParent = nullptr);
 
     QDate getDate() const;
     void setDate(const QDate& pDate);
@@ -51,7 +51,7 @@ signals:
 
 private:
     void wireSignals();
-    NutritionService mService;
+    NutritionService* mService = nullptr;
 };
 
 #endif // NUTRITIONVIEWMODEL_H

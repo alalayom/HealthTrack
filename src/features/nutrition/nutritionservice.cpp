@@ -1,8 +1,10 @@
 #include "nutritionservice.h"
 
-NutritionService::NutritionService(QObject *pParent)
+NutritionService::NutritionService(DatabaseManager* pDatabaseManager, QObject *pParent)
 
     : QObject(pParent)
+    , mDatabaseManager(pDatabaseManager)
+    , mRepository(pDatabaseManager)
     , mDaily(QDate::currentDate())
 {
 
@@ -93,8 +95,7 @@ void NutritionService::clearMeals() noexcept
 
 void NutritionService::addFood(int pMealIndex, const QString &pName, double pCalories, double pProtein, double pCarbs, double pFat)
 {
-    auto tMeals = mDaily.getMeals();
-    if(pMealIndex < 0 || pMealIndex >= tMeals.size())
+    if(pMealIndex < 0 || pMealIndex >= mDaily.getMeals().size())
     {
         return;
     }
@@ -105,18 +106,7 @@ void NutritionService::addFood(int pMealIndex, const QString &pName, double pCal
         return;
     }
 
-    FoodEntry tFood(tTrimmedName, pCalories, pProtein, pCarbs, pFat);
-    MealEntry tMeal = tMeals.at(pMealIndex);
-    tMeal.addFood(std::move(tFood));
-
-    mDaily.removeMeal(pMealIndex);
-    tMeals.insert(pMealIndex, std::move(tMeal));
-
-    mDaily.clearMeals();
-    for(auto& tMealInstance : tMeals)
-    {
-        mDaily.addMeal(std::move(tMealInstance));
-    }
+    mDaily.mealRef(pMealIndex).addFood(FoodEntry(tTrimmedName, pCalories, pProtein, pCarbs, pFat));
 
     emit mealsChanged();
     emit totalsChanged();
@@ -124,28 +114,18 @@ void NutritionService::addFood(int pMealIndex, const QString &pName, double pCal
 
 void NutritionService::removeFood(int pMealIndex, int pFoodIndex)
 {
-    auto tMeals = mDaily.getMeals();
-    if(pMealIndex < 0 || pMealIndex >= tMeals.size())
+    if(pMealIndex < 0 || pMealIndex >= mDaily.getMeals().size())
     {
         return;
     }
 
-    MealEntry tMeal = tMeals.at(pMealIndex);
-    const int tFoodCount = tMeal.getFoods().size();
-    if(pFoodIndex < 0 || pFoodIndex >= tFoodCount)
+    auto& tMeal = mDaily.mealRef(pMealIndex);
+    if(pFoodIndex < 0 || pFoodIndex >= tMeal.getFoods().size())
     {
         return;
     }
 
     tMeal.removeFood(pFoodIndex);
-    mDaily.removeMeal(pMealIndex);
-    tMeals.insert(pMealIndex, std::move(tMeal));
-
-    mDaily.clearMeals();
-    for(auto& tMealInstance : tMeals)
-    {
-        mDaily.addMeal(std::move(tMealInstance));
-    }
 
     emit mealsChanged();
     emit totalsChanged();
@@ -153,28 +133,18 @@ void NutritionService::removeFood(int pMealIndex, int pFoodIndex)
 
 void NutritionService::clearFoods(int pMealIndex)
 {
-    auto tMeals = mDaily.getMeals();
-    if(pMealIndex < 0 || pMealIndex >= tMeals.size())
+    if(pMealIndex < 0 || pMealIndex >= mDaily.getMeals().size())
     {
         return;
     }
 
-    MealEntry tMeal = tMeals.at(pMealIndex);
+    auto& tMeal = mDaily.mealRef(pMealIndex);
     if(tMeal.getFoods().isEmpty())
     {
         return;
     }
 
     tMeal.clearFoods();
-
-    mDaily.removeMeal(pMealIndex);
-    tMeals.insert(pMealIndex, std::move(tMeal));
-    mDaily.clearMeals();
-
-    for(auto& tMealInstance : tMeals)
-    {
-        mDaily.addMeal(std::move(tMealInstance));
-    }
 
     emit mealsChanged();
     emit totalsChanged();
