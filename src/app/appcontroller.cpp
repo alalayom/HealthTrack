@@ -4,8 +4,8 @@
 
 AppController::AppController(QObject *pParent)
     : QObject(pParent)
-    , mAppState()
-    , mNavigationManager()
+    , mAppState(this)
+    , mNavigationManager(this)
     , mNutritionService(&mDatabaseManager, this)
     , mNutritionViewModel(&mNutritionService, this)
 {

@@ -3,11 +3,15 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Item {
+    anchors.fill: parent
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
 
-        //TopPanel
+        // =========================
+        // TOP PANEL
+        // =========================
         Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: 120
@@ -18,19 +22,14 @@ Item {
                 anchors.margins: 20
                 spacing: 40
 
-                //Statistics Section
+                // Statistics Section
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 80
                     radius: 8
                     color: "#2A2A2A"
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            contentStack.replace("../Statistics/StatisticsMain.qml")
-                        }
-                    }
+                    //TODO: Add statistics section to it.
 
                     Label {
                         anchors.centerIn: parent
@@ -40,19 +39,14 @@ Item {
                     }
                 }
 
-                //Settings Section
+                // Settings Section
                 Rectangle {
                     Layout.preferredWidth: 200
                     Layout.preferredHeight: 80
                     radius: 8
                     color: "#2A2A2A"
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            contentStack.replace("../Settings/SettingsMain.qml")
-                        }
-                    }
+                    //TODO: Add settings section to it.
 
                     Label {
                         anchors.centerIn: parent
@@ -64,11 +58,14 @@ Item {
             }
         }
 
-        //Middle Panel
+        // =========================
+        // MIDDLE PANEL
+        // =========================
         StackView {
             id: contentStack
             Layout.fillWidth: true
             Layout.fillHeight: true
+
             initialItem: Rectangle {
                 color: "#181818"
 
@@ -81,7 +78,9 @@ Item {
             }
         }
 
-        //Bottom Panel
+        // =========================
+        // BOTTOM PANEL
+        // =========================
         Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: 140
@@ -92,37 +91,79 @@ Item {
                 anchors.margins: 20
                 spacing: 20
 
-                Repeater {
-                    model: [
-                        {text: "Nutrition", page: "../Nutrition/NutritionMain.qml"},
-                        {text: "Sport", page: "../Sport/SportMain.qml"},
-                        {text: "Sleep", page: "../Sleep/SleepMain.qml"},
-                        {text: "Profile", page: "../Profile/ProfileMain.qml"}
-                    ]
+                //Nutrition Section
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    radius: 8
+                    color: "#2A2A2A"
 
-                    delegate: Rectangle {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        radius: 8
-                        color: "#2A2A2A"
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                contentStack.replace(modelData.page)
-                            }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            contentStack.replace("../Nutrition/NutritionMain.qml");
                         }
+                    }
 
-                        Label {
-                            anchors.centerIn: parent
-                            text: modelData.text
-                            color: "white"
-                            font.pixelSize: 18
-                        }
+                    Label {
+                        anchors.centerIn: parent
+                        text: "Nutrition"
+                        color: "white"
+                        font.pixelSize: 18
+                    }
+                }
+
+                // Sport Section
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    radius: 8
+                    color: "#2A2A2A"
+
+                    //TODO: Add sport section to it.
+
+                    Label {
+                        anchors.centerIn: parent
+                        text: "Sport"
+                        color: "white"
+                        font.pixelSize: 18
+                    }
+                }
+
+                // Sleep Section
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    radius: 8
+                    color: "#2A2A2A"
+
+                    //TODO: Add sleep section to it.
+
+                    Label {
+                        anchors.centerIn: parent
+                        text: "Sleep"
+                        color: "white"
+                        font.pixelSize: 18
+                    }
+                }
+
+                // Profile Section
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    radius: 8
+                    color: "#2A2A2A"
+
+                    //TODO: Add profile section to it.
+
+                    Label {
+                        anchors.centerIn: parent
+                        text: "Profile"
+                        color: "white"
+                        font.pixelSize: 18
                     }
                 }
             }
         }
-
     }
 }

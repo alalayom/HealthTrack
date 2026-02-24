@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Item {
-    property StackView stack
+    anchors.fill: parent
 
     Rectangle {
         anchors.fill: parent
@@ -25,7 +25,8 @@ Item {
                 height: 60
 
                 onClicked: {
-                    stack.push("HomeScreen.qml")
+                    console.log("Login clicked -> go Home")
+                    appController.navigationManager.navigateTo(appController.navigationManager.Home)
                 }
             }
         }
