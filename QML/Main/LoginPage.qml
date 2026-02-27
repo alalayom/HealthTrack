@@ -1,9 +1,12 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import HealthTrack 1.0
 
 Item {
-    anchors.fill: parent
+    id: rootLogin
+    width: parent ? parent.width : 0
+    height: parent ? parent.height : 0
 
     Rectangle {
         anchors.fill: parent
@@ -26,7 +29,7 @@ Item {
 
                 onClicked: {
                     console.log("Login clicked -> go Home")
-                    appController.navigationManager.navigateTo(appController.navigationManager.Home)
+                    appController.navigationManager.navigateTo(NavigationManager.Home)
                 }
             }
         }

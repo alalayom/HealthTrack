@@ -1,10 +1,12 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import HealthTrack 1.0
 
 Item {
     id: nutritionRoot
-    anchors.fill: parent
+    width: parent ? parent.width : 0
+    height: parent ? parent.height : 0
 
     // Added dummy data for testing qml page design. Later data will be provided from ViewModel
     property string selectedDateText: "Today"
@@ -256,8 +258,10 @@ Item {
                 color: card
                 border.color: "#2A2A2A"
                 border.width: 1
+                implicitHeight: mealsContent.implicitHeight + 24
 
                 ColumnLayout {
+                    id: mealsContent
                     anchors.fill: parent
                     anchors.margins: 12
                     spacing: 0
@@ -307,8 +311,10 @@ Item {
                 color: card
                 border.color: "#2A2A2A"
                 border.width: 1
+                implicitHeight: waterContent.implicitHeight + 32
 
                 ColumnLayout {
+                    id: waterContent
                     anchors.fill: parent
                     anchors.margins: 16
                     spacing: 10
@@ -360,6 +366,7 @@ Item {
                 color: card
                 border.color: "#2A2A2A"
                 border.width: 1
+                implicitHeight: weightContent.implicitHeight + 32
 
                 MouseArea {
                     anchors.fill: parent
@@ -367,6 +374,7 @@ Item {
                 }
 
                 ColumnLayout {
+                    id: weightContent
                     anchors.fill: parent
                     anchors.margins: 16
                     spacing: 20
@@ -417,8 +425,10 @@ Item {
                 color: card
                 border.color: "#2A2A2A"
                 border.width: 1
+                implicitHeight: activitiesContent.implicitHeight + 32
 
                 ColumnLayout {
+                    id: activitiesContent
                     anchors.fill: parent
                     anchors.margins: 16
                     spacing: 12
@@ -516,7 +526,7 @@ Item {
     // ============================================================
     component SeperatorLine : Rectangle {
         Layout.fillWidth: true
-        height: 1
+        implicitHeight: 1
         color: "#2A2A2A"
     }
 
@@ -565,6 +575,7 @@ Item {
         signal rowClicked()
 
         implicitHeight: 78
+        implicitWidth: parent ? parent.width : 0
 
         Rectangle {
             anchors.fill: parent
@@ -573,6 +584,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: rowClicked()
+                propagateComposedEvents: true
             }
 
             RowLayout {
@@ -605,19 +617,35 @@ Item {
                         color: textPrimary
                         font.pixelSize: 20
                         font.bold: true
+                        elide: Text.ElideRight
+                        Layout.fillWidth: true
                     }
 
                     Label {
                         text: subtitle
                         color: textSecondary
                         font.pixelSize: 14
+                        elide: Text.ElideRight
+                        Layout.fillWidth: true
                     }
                 }
 
+                //Spacer for button
+                Item {
+                    Layout.fillWidth: true
+                }
+
                 Button {
+                    Layout.preferredHeight: 44
+                    Layout.preferredWidth: 44
                     text: "+"
-                    width: 44
-                    height: 44
+                    contentItem: Label {
+                        text: "+"
+                        anchors.centerIn: parent
+                        color: textPrimary
+                        font.pixelSize: 22
+                        font.bold: true
+                    }
                     onClicked: addClicked()
                 }
             }

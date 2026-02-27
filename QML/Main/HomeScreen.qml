@@ -1,9 +1,12 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import HealthTrack 1.0
 
 Item {
-    anchors.fill: parent
+    id: rootHome
+    width: parent ? parent.width : 0
+    height: parent ? parent.height : 0
 
     ColumnLayout {
         anchors.fill: parent

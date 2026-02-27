@@ -12,16 +12,16 @@ class NavigationManager : public QObject
 public:
     explicit NavigationManager(QObject* pParent = nullptr);
 
-    enum class Page
+    enum Page
     {
-        Login,
-        Home,
-        Nutrition,
-        Profile,
-        Settings,
-        Sleep,
-        Sport,
-        Statistics
+        Login       = 0,
+        Home        = 1,
+        Nutrition   = 2,
+        Profile     = 3,
+        Settings    = 4,
+        Sleep       = 5,
+        Sport       = 6,
+        Statistics  = 7
     };
     Q_ENUM(Page)
 
@@ -33,7 +33,7 @@ public:
     Q_INVOKABLE void navigateToHome();
 
 signals:
-    void currentPageChanged(NavigationManager::Page pPage);
+    void currentPageChanged();
 
 private:
     Page mCurrentPage

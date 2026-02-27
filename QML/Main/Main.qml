@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import HealthTrack 1.0
 
 ApplicationWindow {
     id: root
@@ -20,19 +21,24 @@ ApplicationWindow {
         initialItem: LoginPage {}
     }
 
-    Component.onCompleted: console.log("Main.qml loaded")
+    Component.onCompleted: {
+        console.log("Main completed, nav obj =", appController.navigationManager)
+        console.log("Main currentPage =", appController.navigationManager.currentPage)
+    }
 
     Connections {
         target: appController.navigationManager
+        enabled: true
 
-        function onCurrentPageChanged(pPage) {
-            console.log("NAV changed:", pPage)
+        function onCurrentPageChanged() {
+            const tPage = appController.navigationManager.currentPage;
+            console.log("NAV changed:", tPage)
 
-            if(pPage === appController.navigationManager.Login) {
+            if(tPage === NavigationManager.Login) {
                 rootStack.replace(Qt.resolvedUrl("LoginPage.qml"))
             }
 
-            else if(pPage === appController.navigationManager.Home) {
+            else if(tPage === NavigationManager.Home) {
                 rootStack.replace(Qt.resolvedUrl("HomeScreen.qml"))
             }
         }
