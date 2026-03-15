@@ -150,7 +150,7 @@ Item {
                             }
 
                             Label {
-                                text: "Eaten"
+                                text: "🍽️ Eaten"
                                 color: textSecondary
                                 font.pixelSize: 16
                             }
@@ -302,7 +302,7 @@ Item {
                             }
 
                             Label {
-                                text: "Burned"
+                                text: "⚡ Burned"
                                 color: textSecondary
                                 font.pixelSize: 16
                                 horizontalAlignment: Text.AlignRight
@@ -318,7 +318,7 @@ Item {
 
                         MacroBar {
                             Layout.fillWidth: true
-                            title: "Carbs"
+                            title: "🥖 Carbs"
                             currentValue: carbsCurrent
                             goalValue: carbsGoal
                             accentColor: accent
@@ -326,7 +326,7 @@ Item {
 
                         MacroBar {
                             Layout.fillWidth: true
-                            title: "Protein"
+                            title: "🥩 Protein"
                             currentValue: proteinCurrent
                             goalValue: proteinGoal
                             accentColor: accent
@@ -334,7 +334,7 @@ Item {
 
                         MacroBar {
                             Layout.fillWidth: true
-                            title: "Fat"
+                            title: "🌻 Fat"
                             currentValue: fatCurrent
                             goalValue: fatGoal
                             accentColor: accent
@@ -363,6 +363,7 @@ Item {
                     MealRow {
                         title: "Breakfast"
                         subtitle: breakfastCurrent + " / " + breakfastGoal + " Cal"
+                        iconText: "🍳"
                         onAddClicked: console.log("TODO: Add breakfast")
                         onRowClicked: console.log("TODO: Open breakfast details")
                     }
@@ -372,6 +373,7 @@ Item {
                     MealRow {
                         title: "Lunch"
                         subtitle: lunchCurrent + " / " + lunchGoal + " Cal"
+                        iconText: "🥗"
                         onAddClicked: console.log("TODO: Add lunch")
                         onRowClicked: console.log("TODO: Open lunch details")
                     }
@@ -381,6 +383,7 @@ Item {
                     MealRow {
                         title: "Dinner"
                         subtitle: dinnerCurrent + " / " + dinnerGoal + " Cal"
+                        iconText: "🍗️"
                         onAddClicked: console.log("TODO: Add dinner")
                         onRowClicked: console.log("TODO: Open dinner details")
                     }
@@ -390,6 +393,7 @@ Item {
                     MealRow {
                         title: "Snacks"
                         subtitle: snacksCurrent + " / " + snacksGoal + " Cal"
+                        iconText: "🍎"
                         onAddClicked: console.log("TODO: Add snacks")
                         onRowClicked: console.log("TODO: Open snacks details")
                     }
@@ -421,7 +425,7 @@ Item {
                             spacing: 2
 
                             Label {
-                                text: "Water"
+                                text: "💧 Water"
                                 color: textPrimary
                                 font.pixelSize: 18
                                 font.bold: true
@@ -434,10 +438,33 @@ Item {
                             }
                         }
 
+                        Item {
+                            Layout.fillWidth: true
+                        }
+
                         Button {
-                            text: "+"
-                            width: 44
-                            height: 44
+                            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                            Layout.preferredWidth: 44
+                            Layout.preferredHeight: 44
+                            padding: 0
+
+                            background: Rectangle {
+                                radius: 22
+                                color: parent.down ? "#505050" : "#3A3A3A"
+                            }
+
+                            contentItem: Item {
+                                anchors.fill: parent
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "+"
+                                    color: textPrimary
+                                    font.pixelSize: 24
+                                    font.bold: true
+                                }
+                            }
+
                             onClicked: console.log("TODO: Add water")
                         }
                     }
@@ -475,13 +502,13 @@ Item {
 
                     RowLayout {
                         Layout.fillWidth: true
+                        spacing: 12
 
                         ColumnLayout {
-                            Layout.fillWidth: true
                             spacing: 2
 
                             Label {
-                                text: "Weight"
+                                text: "⏲️ Weight"
                                 color: textPrimary
                                 font.pixelSize: 18
                                 font.bold: true
@@ -494,10 +521,24 @@ Item {
                             }
                         }
 
-                        Label {
-                            text: "Edit"
-                            color: accent
-                            font.pixelSize: 14
+                        Item {
+                            Layout.fillWidth: true
+                        }
+
+                        Rectangle {
+                            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                            Layout.preferredHeight: 36
+                            Layout.preferredWidth: 72
+                            radius: 18
+                            color: "#3A3A3A"
+
+                            Label {
+                                anchors.centerIn: parent
+                                text: "Edit"
+                                color: textPrimary
+                                font.pixelSize: 14
+                                font.bold: true
+                            }
                         }
                     }
 
@@ -534,6 +575,7 @@ Item {
                         font.bold: true
                     }
 
+                    //steps
                     Rectangle {
                         Layout.fillWidth: true
                         radius: 12
@@ -543,13 +585,13 @@ Item {
                         RowLayout {
                             anchors.fill: parent
                             anchors.margins: 12
+                            spacing: 12
 
                             ColumnLayout {
-                                Layout.fillWidth: true
                                 spacing: 2
 
                                 Label {
-                                    text: "Steps"
+                                    text: "👟 Steps"
                                     color: textPrimary
                                     font.pixelSize: 16
                                     font.bold: true
@@ -562,13 +604,39 @@ Item {
                                 }
                             }
 
+                            Item {
+                                Layout.fillWidth: true
+                            }
+
                             Button {
-                                text: "View"
+                                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                                Layout.preferredWidth: 76
+                                Layout.preferredHeight: 44
+                                padding: 0
+
+                                background: Rectangle {
+                                    radius: 22
+                                    color: parent.down ? "#505050" : "#3A3A3A"
+                                }
+
+                                contentItem: Item {
+                                    anchors.fill: parent
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "View"
+                                        color: textPrimary
+                                        font.pixelSize: 16
+                                        font.bold: true
+                                    }
+                                }
+
                                 onClicked: console.log("TODO: Open steps details")
                             }
                         }
                     }
 
+                    //Exercise
                     Rectangle {
                         Layout.fillWidth: true
                         radius: 12
@@ -578,13 +646,13 @@ Item {
                         RowLayout {
                             anchors.fill: parent
                             anchors.margins: 12
+                            spacing: 12
 
                             ColumnLayout {
-                                Layout.fillWidth: true
                                 spacing: 2
 
                                 Label {
-                                    text: "Exercise"
+                                    text: "💪 Exercise"
                                     color: textPrimary
                                     font.pixelSize: 16
                                     font.bold: true
@@ -597,10 +665,33 @@ Item {
                                 }
                             }
 
+                            Item {
+                                Layout.fillWidth: true
+                            }
+
                             Button {
-                                text: "+"
-                                width: 44
-                                height: 44
+                                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                                Layout.preferredWidth: 44
+                                Layout.preferredHeight: 44
+                                padding: 0
+
+                                background: Rectangle {
+                                    radius: 22
+                                    color: parent.down ? "#505050" : "#3A3A3A"
+                                }
+
+                                contentItem: Item {
+                                    anchors.fill: parent
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "+"
+                                        color: textPrimary
+                                        font.pixelSize: 24
+                                        font.bold: true
+                                    }
+                                }
+
                                 onClicked: console.log("TODO: add exercise")
                             }
                         }
@@ -665,6 +756,8 @@ Item {
     component MealRow : Item  {
         property string title: ""
         property string subtitle: ""
+        property string iconText: "🍽️"
+
         signal addClicked()
         signal rowClicked()
 
@@ -683,7 +776,10 @@ Item {
 
             RowLayout {
                 anchors.fill: parent
-                anchors.margins: 12
+                anchors.leftMargin: 12
+                anchors.rightMargin: 12
+                anchors.topMargin: 10
+                anchors.bottomMargin: 10
                 spacing: 12
 
                 //icon placeholder
@@ -695,10 +791,8 @@ Item {
 
                     Label {
                         anchors.centerIn: parent
-                        text: title.length > 0 ? title[0] : "?"
-                        color: textPrimary
-                        font.pixelSize: 18
-                        font.bold: true
+                        text: iconText
+                        font.pixelSize: 20
                     }
                 }
 
@@ -724,22 +818,28 @@ Item {
                     }
                 }
 
-                //Spacer for button
-                Item {
-                    Layout.fillWidth: true
-                }
-
                 Button {
-                    Layout.preferredHeight: 44
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                     Layout.preferredWidth: 44
-                    text: "+"
-                    contentItem: Label {
-                        text: "+"
-                        anchors.centerIn: parent
-                        color: textPrimary
-                        font.pixelSize: 22
-                        font.bold: true
+                    Layout.preferredHeight: 44
+
+                    background: Rectangle {
+                        radius: 22
+                        color: parent.down ? "#505050" : "#3A3A3A"
                     }
+
+                    contentItem: Item {
+                        anchors.fill: parent
+
+                        Label {
+                            anchors.centerIn: parent
+                            text: "+"
+                            color: textPrimary
+                            font.pixelSize: 24
+                            font.bold: true
+                        }
+                    }
+
                     onClicked: addClicked()
                 }
             }
