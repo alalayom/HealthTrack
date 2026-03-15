@@ -10,10 +10,10 @@ Item {
 
     // Added dummy data for testing qml page design. Later data will be provided from ViewModel
     property string selectedDateText: "Today"
-    property int caloriesEaten: 1291
+    property int caloriesEaten: 5291
     property int caloriesBurned: 244
     property int caloriesGoal: 2117
-    property int caloriesRemaining: Math.max(0, caloriesGoal - caloriesEaten + caloriesBurned)
+    property int caloriesRemaining: caloriesGoal - caloriesEaten + caloriesBurned
 
     property int carbsCurrent: 206
     property int carbsGoal: 258
@@ -108,100 +108,194 @@ Item {
                 color: card
                 border.color: "#2A2A2A"
                 border.width: 1
-                implicitHeight: 240
+                implicitHeight: 270
 
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 16
-                    spacing: 14
+                    spacing: 18
 
                     // Top row: Eaten / Gauge / Burned
                     RowLayout {
+                        id: summaryRow
                         Layout.fillWidth: true
                         spacing: 12
 
+                        property int eatenValue: Math.round(caloriesEaten)
+                        property int burnedValue: Math.round(caloriesBurned)
+
+                        property int netCalories: Math.round(caloriesEaten - caloriesBurned)
+                        property int remainingValue: Math.round(caloriesGoal - netCalories)
+
+                        property real goalSafe: Math.max(1, caloriesGoal)
+                        property real progressRatio: Math.max(0, netCalories / goalSafe)
+                        property bool isOverGoal: remainingValue < 0
+
+                        onNetCaloriesChanged: calorieGauge.requestPaint()
+                        onRemainingValueChanged: calorieGauge.requestPaint()
+                        onProgressRatioChanged: calorieGauge.requestPaint()
+                        onIsOverGoalChanged: calorieGauge.requestPaint()
+
                         // Eaten
                         ColumnLayout {
-                            Layout.preferredWidth: 160
+                            Layout.preferredWidth: 110
+                            Layout.alignment: Qt.AlignCenter | Qt.AlignLeft
                             spacing: 4
 
                             Label {
-                                text: caloriesEaten.toLocaleString(Qt.locale("en_US"))
+                                text: summaryRow.eatenValue.toString()
                                 color: textPrimary
-                                font.pixelSize: 16
+                                font.pixelSize: 28
                                 font.bold: true
                             }
 
                             Label {
                                 text: "Eaten"
                                 color: textSecondary
-                                font.pixelSize: 14
+                                font.pixelSize: 16
                             }
                         }
 
-                        // Gauge (Remaining)
+                        // Remaining gauge
                         Item {
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 110
+                            Layout.preferredWidth: 180
+                            Layout.preferredHeight: 160
+                            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-                            Rectangle {
-                                id: gaugeBg
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: Math.min(parent.width, 260)
-                                height: 16
-                                radius: 999
-                                color: "#2C2C2C"
-                            }
+                            Canvas {
+                                id: calorieGauge
+                                anchors.centerIn: parent
+                                width: 150
+                                height: 150
 
-                            Rectangle {
-                                anchors.left: gaugeBg.left
-                                anchors.verticalCenter: gaugeBg.verticalCenter
-                                height: gaugeBg.height
-                                radius: 999
-                                color: accent
-                                width: {
-                                    const denom = Math.max(1, caloriesGoal)
-                                    const pct = Math.max(0, Math.min(1, caloriesEaten / denom))
-                                    return gaugeBg.width * pct
+                                onPaint: {
+                                    const tContext = getContext("2d")
+                                    tContext.reset()
+
+                                    const tCenterX = width / 2
+                                    const tCenterY = height / 2
+                                    const tRadius = 54
+                                    const tStrokeWidth = 13
+                                    const tStartAngle = Math.PI / 2
+                                    const tFullCircle = 2 * Math.PI
+
+                                    // BG ring
+                                    tContext.beginPath()
+                                    tContext.strokeStyle = "#2C2C2C"
+                                    tContext.lineWidth = tStrokeWidth
+                                    tContext.lineCap = "round"
+                                    tContext.arc(tCenterX, tCenterY, tRadius, 0, tFullCircle, false)
+                                    tContext.stroke()
+
+                                    const tRatio = summaryRow.progressRatio
+
+                                    if (!summaryRow.isOverGoal) {
+                                        const tProgress = Math.max(0, Math.min(1, tRatio))
+
+                                        if (tProgress > 0) {
+                                            tContext.beginPath()
+                                            tContext.strokeStyle = accent
+                                            tContext.lineWidth = tStrokeWidth
+                                            tContext.lineCap = "round"
+                                            tContext.arc(
+                                                tCenterX,
+                                                tCenterY,
+                                                tRadius,
+                                                tStartAngle,
+                                                tStartAngle + (tFullCircle * tProgress),
+                                                false
+                                            )
+                                            tContext.stroke()
+                                        }
+                                    } else {
+                                        // if over-goal, then make it whole red
+                                        tContext.beginPath()
+                                        tContext.strokeStyle = "rgba(255, 90, 95, 0.55)"
+                                        tContext.lineWidth = tStrokeWidth
+                                        tContext.lineCap = "round"
+                                        tContext.arc(tCenterX, tCenterY, tRadius, 0, tFullCircle, false)
+                                        tContext.stroke()
+
+                                        const tFullLaps = Math.floor(tRatio)
+                                        const tPartialLap = tRatio - tFullLaps
+
+                                        // Every full lap is red
+                                        for (let i = 0; i < tFullLaps; ++i) {
+                                            const tAlpha = Math.min(0.45 + i * 0.14, 1.0)
+
+                                            tContext.beginPath()
+                                            tContext.strokeStyle = "rgba(255, 90, 95, " + tAlpha + ")"
+                                            tContext.lineWidth = tStrokeWidth
+                                            tContext.lineCap = "round"
+                                            tContext.arc(
+                                                tCenterX,
+                                                tCenterY,
+                                                tRadius,
+                                                tStartAngle,
+                                                tStartAngle + tFullCircle,
+                                                false
+                                            )
+                                            tContext.stroke()
+                                        }
+
+                                        // Last lap remaining part
+                                        if (tPartialLap > 0) {
+                                            const tAlpha = Math.min(0.45 + tFullLaps * 0.14, 1.0)
+
+                                            tContext.beginPath()
+                                            tContext.strokeStyle = "rgba(255, 90, 95, " + tAlpha + ")"
+                                            tContext.lineWidth = tStrokeWidth
+                                            tContext.lineCap = "round"
+                                            tContext.arc(
+                                                tCenterX,
+                                                tCenterY,
+                                                tRadius,
+                                                tStartAngle,
+                                                tStartAngle + (tFullCircle * tPartialLap),
+                                                false
+                                            )
+                                            tContext.stroke()
+                                        }
+                                    }
                                 }
+
+                                Component.onCompleted: requestPaint()
                             }
 
                             Column {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.top: gaugeBg.bottom
-                                anchors.topMargin: 12
-                                spacing: 2
+                                anchors.centerIn: calorieGauge
+                                spacing: 0
 
                                 Label {
-                                    text: caloriesRemaining
-                                    color: textPrimary
-                                    font.pixelSize: 28
+                                    text: summaryRow.remainingValue.toString()
+                                    color: summaryRow.isOverGoal ? "#FF5A5F" : textPrimary
+                                    font.pixelSize: 34
                                     font.bold: true
                                     horizontalAlignment: Text.AlignHCenter
-                                    width: parent.width
+                                    width: 110
                                 }
 
                                 Label {
                                     text: "Remaining"
                                     color: textSecondary
-                                    font.pixelSize: 14
+                                    font.pixelSize: 12
                                     horizontalAlignment: Text.AlignHCenter
-                                    width: parent.width
+                                    width: 110
                                 }
                             }
                         }
 
                         // Burned
                         ColumnLayout {
-                            Layout.preferredWidth: 160
+                            Layout.preferredWidth: 110
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                             spacing: 4
-                            Layout.alignment: Qt.AlignRight
 
                             Label {
-                                text: caloriesBurned.toLocaleString(Qt.locale("en_US"))
+                                text: summaryRow.burnedValue.toString()
                                 color: textPrimary
-                                font.pixelSize: 26
+                                font.pixelSize: 28
                                 font.bold: true
                                 horizontalAlignment: Text.AlignRight
                                 Layout.fillWidth: true
@@ -210,7 +304,7 @@ Item {
                             Label {
                                 text: "Burned"
                                 color: textSecondary
-                                font.pixelSize: 14
+                                font.pixelSize: 16
                                 horizontalAlignment: Text.AlignRight
                                 Layout.fillWidth: true
                             }
