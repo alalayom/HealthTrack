@@ -17,7 +17,7 @@ Item {
         // =========================
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 120
+            Layout.preferredHeight: 80
             color: "#1E1E1E"
 
             RowLayout {
@@ -28,7 +28,7 @@ Item {
                 // Statistics Section
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 80
+                    Layout.preferredHeight: 44
                     radius: 8
                     color: "#2A2A2A"
 
@@ -45,7 +45,7 @@ Item {
                 // Settings Section
                 Rectangle {
                     Layout.preferredWidth: 200
-                    Layout.preferredHeight: 80
+                    Layout.preferredHeight: 44
                     radius: 8
                     color: "#2A2A2A"
 
@@ -86,7 +86,7 @@ Item {
         // =========================
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 140
+            Layout.preferredHeight: 80
             color: "#1E1E1E"
 
             RowLayout {

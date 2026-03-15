@@ -10,7 +10,7 @@ Item {
 
     // Added dummy data for testing qml page design. Later data will be provided from ViewModel
     property string selectedDateText: "Today"
-    property int caloriesEaten: 5291
+    property int caloriesEaten: 1291
     property int caloriesBurned: 244
     property int caloriesGoal: 2117
     property int caloriesRemaining: caloriesGoal - caloriesEaten + caloriesBurned
@@ -47,6 +47,8 @@ Item {
     readonly property color textSecondary: "#A0A0A0"
     readonly property color accent: "#2DA8FF"
 
+    property string dailyNotes: ""
+
     Rectangle {
         anchors.fill: parent
         color: bg
@@ -70,7 +72,6 @@ Item {
                 spacing: 12
 
                 ColumnLayout {
-                    Layout.fillWidth: true
                     spacing: 4
 
                     Label {
@@ -87,12 +88,32 @@ Item {
                     }
                 }
 
+                Item {
+                    Layout.fillWidth: true
+                }
+
                 //TODO: Add date change menu to here
                 Button {
-                    text: "📅"
-                    font.pixelSize: 18
-                    width: 44
-                    height: 44
+                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                    Layout.preferredWidth: 60
+                    Layout.preferredHeight: 44
+                    padding: 0
+
+                    background: Rectangle {
+                        radius: 22
+                        color: parent.down ? "#505050" : "#3A3A3A"
+                    }
+
+                    contentItem: Item {
+                        anchors.fill: parent
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "📅"
+                            font.pixelSize: 18
+                        }
+                    }
+
                     onClicked: {
                         console.log("TODO: date picker")
                     }
@@ -491,6 +512,7 @@ Item {
 
                 MouseArea {
                     anchors.fill: parent
+                    propagateComposedEvents: true
                     onClicked: console.log("TODO: Update weight dialog")
                 }
 
@@ -525,19 +547,31 @@ Item {
                             Layout.fillWidth: true
                         }
 
-                        Rectangle {
+                        Button {
                             Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                             Layout.preferredHeight: 36
                             Layout.preferredWidth: 72
-                            radius: 18
-                            color: "#3A3A3A"
+                            padding: 0
 
-                            Label {
-                                anchors.centerIn: parent
-                                text: "Edit"
-                                color: textPrimary
-                                font.pixelSize: 14
-                                font.bold: true
+                            background: Rectangle {
+                                radius: 18
+                                color: parent.down ? "#505050" : "#3A3A3A"
+                            }
+
+                            contentItem: Item {
+                                anchors.fill: parent
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "Edit"
+                                    color: textPrimary
+                                    font.pixelSize: 14
+                                    font.bold: true
+                                }
+                            }
+
+                            onClicked: {
+                                console.log("TODO: Update weight dialog")
                             }
                         }
                     }
@@ -698,6 +732,103 @@ Item {
                     }
                 }
             }
+
+            // =========================
+            // NOTES CARD
+            // =========================
+            Rectangle {
+                Layout.fillWidth: true
+                radius: 16
+                color: card
+                border.color: "#2A2A2A"
+                border.width: 1
+                implicitHeight: notesContent.implicitHeight + 32
+
+                ColumnLayout {
+                    id: notesContent
+                    anchors.fill: parent
+                    anchors.margins: 16
+                    spacing: 12
+
+                    Label {
+                        text: "📝 Notes"
+                        color: textPrimary
+                        font.pixelSize: 18
+                        font.bold: true
+                    }
+
+                    Label {
+                        text: "Write how you feel, how your diet went, or anything important about today."
+                        color: textSecondary
+                        font.pixelSize: 14
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 120
+                        radius: 12
+                        color: card2
+                        border.color: "#2A2A2A"
+                        border.width: 1
+
+                        TextArea {
+                            id: notesInput
+                            anchors.fill: parent
+                            anchors.margins: 12
+                            text: dailyNotes
+                            placeholderText: "For example: Felt energetic today, lunch was too heavy, drank less water than usual..."
+                            placeholderTextColor: "#7A7A7A"
+                            color: textPrimary
+                            wrapMode: TextEdit.Wrap
+                            font.pixelSize: 14
+                            selectByMouse: true
+                            background: null
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        Item {
+                            Layout.fillWidth: true
+                        }
+
+                        Button {
+                            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                            Layout.preferredWidth: 88
+                            Layout.preferredHeight: 40
+                            padding: 0
+                            enabled: notesInput.text.trim() !== dailyNotes.trim()
+
+                            background: Rectangle {
+                                radius: 20
+                                color: parent.down ? "#505050" : "#3A3A3A"
+                            }
+
+                            contentItem: Item {
+                                anchors.fill: parent
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "Save"
+                                    color: textPrimary
+                                    font.pixelSize: 14
+                                    font.bold: true
+                                }
+                            }
+
+                            onClicked: {
+                                dailyNotes = notesInput.text
+                                console.log("TODO: Save notes ->", dailyNotes)
+                            }
+                        }
+                    }
+                }
+
+            }
+
 
             // Bottom spacing
             Item {
