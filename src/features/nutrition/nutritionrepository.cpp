@@ -119,6 +119,84 @@ bool NutritionRepository::deleteDailyEntry(const QDate& pDate)
     return tQuery.exec();
 }
 
+bool NutritionRepository::insertCatalogFood(const FoodEntry &pFood)
+{
+    const QString tName = pFood.getName().trimmed();
+    if(tName.isEmpty())
+    {
+        return false;
+    }
+
+    QSqlQuery tQuery(mDatabaseManager->database());
+    tQuery.prepare(R"(
+        INSERT INTO foods(name, calories, protein, carbs, fat)
+        VALUES(?, ?, ?, ?, ?)
+    )");
+
+    tQuery.addBindValue(tName);
+    tQuery.addBindValue(pFood.getCalories());
+    tQuery.addBindValue(pFood.getProtein());
+    tQuery.addBindValue(pFood.getCarbs());
+    tQuery.addBindValue(pFood.getFat());
+
+    if(!tQuery.exec())
+    {
+        qWarning() << "insertCatalogFood failed:" << tQuery.lastError().text();
+        return false;
+    }
+
+    return true;
+}
+
+QVariantList NutritionRepository::searchCatalogFoods(const QString &pSearchText) const
+{
+    QVariantList tResults;
+    QSqlQuery tQuery(mDatabaseManager->database());
+    const QString tSearch = pSearchText.trimmed();
+
+    if(tSearch.isEmpty())
+    {
+        tQuery.prepare(R"(
+            SELECT id, name, calories, protein, carbs, fat
+            FROM foods
+            ORDER BY name COLLATE NOCASE ASC
+            LIMIT 50
+        )");
+    }
+    else
+    {
+        tQuery.prepare(R"(
+            SELECT id, name, calories, protein, carbs, fat
+            FROM foods
+            WHERE name LIKE ?
+            ORDER BY name COLLATE NOCASE ASC
+            LIMIT 50
+        )");
+        tQuery.addBindValue("%" + tSearch + "%");
+    }
+
+    if(!tQuery.exec())
+    {
+        qWarning() << "searchCatalogFoods failed:" << tQuery.lastError().text();
+        return tResults;
+    }
+
+    while(tQuery.next())
+    {
+        QVariantMap tFoodMap;
+        tFoodMap["id"] = tQuery.value(0).toInt();
+        tFoodMap["name"] = tQuery.value(1).toString();
+        tFoodMap["calories"] = tQuery.value(2).toDouble();
+        tFoodMap["protein"] = tQuery.value(3).toDouble();
+        tFoodMap["carbs"] = tQuery.value(4).toDouble();
+        tFoodMap["fat"] = tQuery.value(5).toDouble();
+
+        tResults.append(tFoodMap);
+    }
+
+    return tResults;
+}
+
 int NutritionRepository::ensureDailyId(const QDate& pDate)
 {
     QSqlQuery tQuery(mDatabaseManager->database());

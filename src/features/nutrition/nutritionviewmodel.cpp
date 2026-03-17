@@ -73,12 +73,25 @@ void NutritionViewModel::clearFoods(int pMealIndex)
     mService->clearFoods(pMealIndex);
 }
 
+bool NutritionViewModel::addCatalogFood(const QString &pName, double pCalories, double pProtein, double pCarbs, double pFat)
+{
+    return mService->addCatalogFood(pName, pCalories, pProtein, pCarbs, pFat);
+}
+
+QVariantList NutritionViewModel::searchCatalogFoods(const QString &pSearchText) const
+{
+    return mService->searchCatalogFoods(pSearchText);
+}
+
 void NutritionViewModel::wireSignals()
 {
     connect(mService, &NutritionService::dateChanged, this, &NutritionViewModel::dateChanged);
     connect(mService, &NutritionService::mealsChanged, this, &NutritionViewModel::mealsChanged);
+
     connect(mService, &NutritionService::totalsChanged, this, &NutritionViewModel::totalCaloriesChanged);
     connect(mService, &NutritionService::totalsChanged, this, &NutritionViewModel::totalProteinChanged);
     connect(mService, &NutritionService::totalsChanged, this, &NutritionViewModel::totalCarbsChanged);
     connect(mService, &NutritionService::totalsChanged, this, &NutritionViewModel::totalFatChanged);
+
+    connect(mService, &NutritionService::catalogFoodsChanged, this, &NutritionViewModel::catalogFoodsChanged);
 }

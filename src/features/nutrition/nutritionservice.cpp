@@ -1,13 +1,12 @@
 #include "nutritionservice.h"
 
 NutritionService::NutritionService(DatabaseManager* pDatabaseManager, QObject *pParent)
-
     : QObject(pParent)
     , mDatabaseManager(pDatabaseManager)
     , mRepository(pDatabaseManager)
     , mDaily(QDate::currentDate())
 {
-
+    loadCurrentDay();
 }
 
 const DailyEntry &NutritionService::dailyEntry() const noexcept
@@ -27,10 +26,9 @@ void NutritionService::setDate(const QDate &pDate)
         return;
     }
 
-    mDaily.setDate(pDate);
-    emit dateChanged();
+    mDaily = mRepository.loadDailyEntry(pDate);
 
-    //This could change meals and total
+    emit dateChanged();
     emit mealsChanged();
     emit totalsChanged();
 }
@@ -64,6 +62,8 @@ void NutritionService::addMeal(const QString &pMealName)
     }
 
     mDaily.addMeal(MealEntry(pMealName));
+    saveCurrentDay();
+
     emit mealsChanged();
     emit totalsChanged();
 }
@@ -77,6 +77,8 @@ void NutritionService::removeMeal(int pMealIndex)
     }
 
     mDaily.removeMeal(pMealIndex);
+    saveCurrentDay();
+
     emit mealsChanged();
     emit totalsChanged();
 }
@@ -89,6 +91,8 @@ void NutritionService::clearMeals() noexcept
     }
 
     mDaily.clearMeals();
+    saveCurrentDay();
+
     emit mealsChanged();
     emit totalsChanged();
 }
@@ -107,6 +111,7 @@ void NutritionService::addFood(int pMealIndex, const QString &pName, double pCal
     }
 
     mDaily.mealRef(pMealIndex).addFood(FoodEntry(tTrimmedName, pCalories, pProtein, pCarbs, pFat));
+    saveCurrentDay();
 
     emit mealsChanged();
     emit totalsChanged();
@@ -126,6 +131,7 @@ void NutritionService::removeFood(int pMealIndex, int pFoodIndex)
     }
 
     tMeal.removeFood(pFoodIndex);
+    saveCurrentDay();
 
     emit mealsChanged();
     emit totalsChanged();
@@ -145,6 +151,7 @@ void NutritionService::clearFoods(int pMealIndex)
     }
 
     tMeal.clearFoods();
+    saveCurrentDay();
 
     emit mealsChanged();
     emit totalsChanged();
@@ -175,6 +182,7 @@ QVariantList NutritionService::mealsAsVariantList() const
     QVariantList tList;
     const auto& tMeals = mDaily.getMeals();
     tList.reserve(tMeals.size());
+
     for(const auto& tMeal : tMeals)
     {
         tList.push_back(mealToVariant(tMeal));
@@ -194,6 +202,40 @@ QVariantMap NutritionService::dailyTotalAsVariantMap() const
     return tMap;
 }
 
+bool NutritionService::addCatalogFood(const QString &pName, double pCalories, double pProtein, double pCarbs, double pFat)
+{
+    const QString tTrimmedName = pName.trimmed();
+
+    if(tTrimmedName.isEmpty())
+    {
+        return false;
+    }
+
+    const bool tSuccess = mRepository.insertCatalogFood(FoodEntry(tTrimmedName, pCalories, pProtein, pCarbs, pFat));
+
+    if(tSuccess)
+    {
+        emit catalogFoodsChanged();
+    }
+
+    return tSuccess;
+}
+
+QVariantList NutritionService::searchCatalogFoods(const QString &pSearchText) const
+{
+    return mRepository.searchCatalogFoods(pSearchText);
+}
+
+bool NutritionService::saveCurrentDay()
+{
+    return mRepository.saveDailyEntry(mDaily);
+}
+
+void NutritionService::loadCurrentDay()
+{
+    mDaily = mRepository.loadDailyEntry(mDaily.getDate());
+}
+
 QVariantMap NutritionService::foodToVariant(const FoodEntry &pFood)
 {
     QVariantMap tMap;
@@ -202,6 +244,7 @@ QVariantMap NutritionService::foodToVariant(const FoodEntry &pFood)
     tMap["protein"] = pFood.getProtein();
     tMap["carbs"] = pFood.getCarbs();
     tMap["fat"] = pFood.getFat();
+
     return tMap;
 }
 
@@ -212,6 +255,7 @@ QVariantMap NutritionService::mealToVariant(const MealEntry &pMeal)
 
     QVariantList tFoods;
     tFoods.reserve(pMeal.getFoods().size());
+
     for(const auto& tFood : pMeal.getFoods())
     {
         tFoods.push_back(foodToVariant(tFood));

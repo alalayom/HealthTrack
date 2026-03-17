@@ -44,14 +44,22 @@ public:
     QVariantList mealsAsVariantList() const;
     QVariantMap dailyTotalAsVariantMap() const;
 
+    bool addCatalogFood(const QString& pName, double pCalories, double pProtein, double pCarbs, double pFat);
+    QVariantList searchCatalogFoods(const QString& pSearchText) const;
+
+    bool saveCurrentDay();
+    void loadCurrentDay();
+
 signals:
     void dateChanged();
     void mealsChanged();
     void totalsChanged();
+    void catalogFoodsChanged();
 
 private:
     static QVariantMap foodToVariant(const FoodEntry& pFood);
     static QVariantMap mealToVariant(const MealEntry& pMeal);
+
     DatabaseManager* mDatabaseManager = nullptr;
     NutritionRepository mRepository;
     DailyEntry mDaily;

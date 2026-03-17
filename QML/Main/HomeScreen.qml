@@ -8,6 +8,27 @@ Item {
     width: parent ? parent.width : 0
     height: parent ? parent.height : 0
 
+    readonly property var nav: appController.navigationManager
+
+    function middleSourceFromPage() {
+        const tPage = nav.currentPage
+
+        if (tPage === NavigationManager.Nutrition)
+        {
+            return "../Nutrition/NutritionMain.qml"
+        }
+        if (tPage === NavigationManager.MealDetails)
+        {
+            return "../Nutrition/MealDetails.qml"
+        }
+        if (tPage === NavigationManager.AddFood)
+        {
+            return "../Nutrition/AddFood.qml"
+        }
+
+        return ""
+    }
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -16,6 +37,7 @@ Item {
         // TOP PANEL
         // =========================
         Rectangle {
+            id: topPanel
             Layout.fillWidth: true
             Layout.preferredHeight: 80
             color: "#1E1E1E"
@@ -64,13 +86,28 @@ Item {
         // =========================
         // MIDDLE PANEL
         // =========================
-        StackView {
-            id: contentStack
+        Rectangle {
+            id: middlePanel
             Layout.fillWidth: true
             Layout.fillHeight: true
+            color: "#181818"
 
-            initialItem: Rectangle {
-                color: "#181818"
+            Loader {
+                id: middleLoader
+                anchors.fill: parent
+                source: rootHome.middleSourceFromPage()
+
+                onStatusChanged: {
+                    if(status === Loader.Error)
+                    {
+                        console.log("Loader error: ", source)
+                    }
+                }
+            }
+
+            Item {
+                anchors.fill: parent
+                visible: middleLoader.status === Loader.Null
 
                 Label {
                     anchors.centerIn: parent
@@ -99,13 +136,14 @@ Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     radius: 8
-                    color: "#2A2A2A"
+                    color: nav.currentPage === NavigationManager.Nutrition
+                        || nav.currentPage === NavigationManager.MealDetails
+                        || nav.currentPage === NavigationManager.AddFood
+                        ? "#3A3A3A" : "#2A2A2A"
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: {
-                            contentStack.replace("../Nutrition/NutritionMain.qml");
-                        }
+                        onClicked: nav.navigateToNutrition()
                     }
 
                     Label {
@@ -168,5 +206,17 @@ Item {
                 }
             }
         }
+    }
+
+    Connections {
+        target: nav
+
+        function onCurrentPageChanged() {
+            middleLoader.source = rootHome.middleSourceFromPage()
+        }
+    }
+
+    Component.onCompleted: {
+        middleLoader.source = rootHome.middleSourceFromPage()
     }
 }

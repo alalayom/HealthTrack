@@ -37,7 +37,6 @@ ApplicationWindow {
             if(tPage === NavigationManager.Login) {
                 rootStack.replace(Qt.resolvedUrl("LoginPage.qml"))
             }
-
             else if(tPage === NavigationManager.Home) {
                 rootStack.replace(Qt.resolvedUrl("HomeScreen.qml"))
             }

@@ -82,6 +82,8 @@ qt_add_qml_module(appHealthTrack
         SOURCES src/app/appcontroller.h src/app/appcontroller.cpp
         SOURCES src/app/navigationmanager.h src/app/navigationmanager.cpp
         SOURCES src/app/appstate.h src/app/appstate.cpp
+        QML_FILES QML/Nutrition/MealDetails.qml
+        QML_FILES QML/Nutrition/AddFood.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

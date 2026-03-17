@@ -385,8 +385,8 @@ Item {
                         title: "Breakfast"
                         subtitle: breakfastCurrent + " / " + breakfastGoal + " Cal"
                         iconText: "🍳"
-                        onAddClicked: console.log("TODO: Add breakfast")
-                        onRowClicked: console.log("TODO: Open breakfast details")
+                        onRowClicked: appController.navigationManager.openMealDetails(0, "Breakfast")
+                        onAddClicked: appController.navigationManager.openMealDetails(0, "Breakfast")
                     }
 
                     SeperatorLine {}
@@ -395,8 +395,8 @@ Item {
                         title: "Lunch"
                         subtitle: lunchCurrent + " / " + lunchGoal + " Cal"
                         iconText: "🥗"
-                        onAddClicked: console.log("TODO: Add lunch")
-                        onRowClicked: console.log("TODO: Open lunch details")
+                        onAddClicked: appController.navigationManager.openMealDetails(1, "Lunch")
+                        onRowClicked: appController.navigationManager.openMealDetails(1, "Lunch")
                     }
 
                     SeperatorLine {}
@@ -405,8 +405,8 @@ Item {
                         title: "Dinner"
                         subtitle: dinnerCurrent + " / " + dinnerGoal + " Cal"
                         iconText: "🍗️"
-                        onAddClicked: console.log("TODO: Add dinner")
-                        onRowClicked: console.log("TODO: Open dinner details")
+                        onAddClicked: appController.navigationManager.openMealDetails(2, "Dinner")
+                        onRowClicked: appController.navigationManager.openMealDetails(2, "Dinner")
                     }
 
                     SeperatorLine {}
@@ -415,8 +415,8 @@ Item {
                         title: "Snacks"
                         subtitle: snacksCurrent + " / " + snacksGoal + " Cal"
                         iconText: "🍎"
-                        onAddClicked: console.log("TODO: Add snacks")
-                        onRowClicked: console.log("TODO: Open snacks details")
+                        onAddClicked: appController.navigationManager.openMealDetails(3, "Snacks")
+                        onRowClicked: appController.navigationManager.openMealDetails(3, "Snacks")
                     }
                 }
             }
@@ -828,7 +828,6 @@ Item {
                 }
 
             }
-
 
             // Bottom spacing
             Item {

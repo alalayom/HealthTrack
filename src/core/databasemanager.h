@@ -6,7 +6,7 @@
 class DatabaseManager
 {
 public:
-    static bool initialize();
+    static bool initialize(bool pDevResetDatabase = false);
     static QSqlDatabase database();
 
     DatabaseManager();

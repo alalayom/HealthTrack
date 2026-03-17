@@ -14,26 +14,11 @@ AppController::AppController(QObject *pParent)
 
 bool AppController::initialize(bool pDevResetDatabase)
 {
-    if(!mDatabaseManager.initialize())
+    if(!mDatabaseManager.initialize(pDevResetDatabase))
     {
         qCritical() << "Database initialization failed.";
         return false;
     }
-
-//works only in debug not in release
-#ifdef QT_DEBUG
-    if(pDevResetDatabase)
-    {
-        qDebug() << "DEV MODE: deleting all tables...";
-        mDatabaseManager.deleteTablesForTest();
-
-        if(!mDatabaseManager.initialize())
-        {
-            qCritical() << "Database re-initialization failed.";
-            return false;
-        }
-    }
-#endif
 
     setupDependencies();
 

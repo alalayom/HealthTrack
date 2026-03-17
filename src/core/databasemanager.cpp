@@ -7,11 +7,11 @@
 #include <QDir>
 #include <QDebug>
 
-static const char* CONNECTION_NAME = "HealtTrackConnection";
+static const char* CONNECTION_NAME = "HealthTrackConnection";
 
 DatabaseManager::DatabaseManager() {}
 
-bool DatabaseManager::initialize()
+bool DatabaseManager::initialize(bool pDevResetDatabase)
 {
 
     if(!openDatabase())
@@ -23,6 +23,18 @@ bool DatabaseManager::initialize()
     {
         return false;
     }
+
+#ifdef QT_DEBUG
+    if(pDevResetDatabase)
+    {
+        qDebug() << "DEV MODE: deleting all tables before createTables...";
+        if(!deleteTablesForTest())
+        {
+            qCritical() << "Failed to delete tables for test.";
+            return false;
+        }
+    }
+#endif
 
     if(!createTables())
     {
@@ -192,17 +204,35 @@ bool DatabaseManager::createTables()
         return false;
     }
 
+    //foods -> catalog (saved foods)
+    if(!tQuery.exec(R"(
+        CREATE TABLE IF NOT EXISTS foods(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE,
+            calories REAL NOT NULL,
+            protein REAL NOT NULL,
+            carbs REAL NOT NULL,
+            fat REAL NOT NULL
+        )
+    )"))
+    {
+        qCritical() << "Failed to create foods: " << tQuery.lastError().text();
+        return false;
+    }
+
     //Food_entries table
     if(!tQuery.exec(R"(
         CREATE TABLE IF NOT EXISTS food_entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             meal_id INTEGER NOT NULL,
+            catalog_food_id INTEGER,
             name TEXT NOT NULL,
             calories REAL NOT NULL,
             protein REAL NOT NULL,
             carbs REAL NOT NULL,
             fat REAL NOT NULL,
-            FOREIGN KEY(meal_id) REFERENCES meal_entries(id) ON DELETE CASCADE
+            FOREIGN KEY(meal_id) REFERENCES meal_entries(id) ON DELETE CASCADE,
+            FOREIGN KEY(catalog_food_id) REFERENCES foods(id) ON DELETE SET NULL
         )
     )"))
     {
@@ -226,6 +256,24 @@ bool DatabaseManager::createTables()
     )"))
     {
         qCritical() << "Failed to create idx_food_meal_id:" << tQuery.lastError().text();
+        return false;
+    }
+
+    if(!tQuery.exec(R"(
+        CREATE INDEX IF NOT EXISTS idx_food_entries_catalog_food_id
+        ON food_entries(catalog_food_id)
+    )"))
+    {
+        qCritical() << "Failed to create idx_food_entries_catalog_food_id:" << tQuery.lastError().text();
+        return false;
+    }
+
+    if(!tQuery.exec(R"(
+        CREATE INDEX IF NOT EXISTS idx_foods_name
+        ON foods(name COLLATE NOCASE)
+    )"))
+    {
+        qCritical() << "Failed to create idx_foods_name:" << tQuery.lastError().text();
         return false;
     }
 
