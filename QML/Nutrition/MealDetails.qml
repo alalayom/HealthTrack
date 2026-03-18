@@ -13,18 +13,34 @@ Page {
     property int mealIndex: nav.selectedMealIndex
     property string mealName: nav.selectedMealName
 
-    property var mealsData: nutritionVM.meals
-    property var selectedMeal: {
-        if(mealIndex >= 0 && mealIndex < mealsData.length)
+    property var mealFoods: []
+    property var mealTotals: ({ calories: 0, protein: 0, carbs: 0, fat: 0 })
+
+    function refreshMealData() {
+        const meals = nutritionVM.meals
+
+        console.log("refreshMealData -> mealIndex:", mealIndex, "meal count:", meals.length)
+
+        if (mealIndex >= 0 && mealIndex < meals.length)
         {
-            return mealsData[mealIndex]
+            const meal = meals[mealIndex]
+
+            mealFoods = meal && meal.foods ? meal.foods : []
+            mealTotals = meal && meal.totals
+                       ? meal.totals
+                       : ({ calories: 0, protein: 0, carbs: 0, fat: 0 })
+
+            console.log("mealFoods count:", mealFoods.length)
+            console.log("mealTotals calories:", Number(mealTotals.calories))
         }
+        else
+        {
+            mealFoods = []
+            mealTotals = ({ calories: 0, protein: 0, carbs: 0, fat: 0 })
 
-        return null
+            console.log("Invalid mealIndex:", mealIndex)
+        }
     }
-
-    property var mealFoods: selectedMeal && selectedMeal.foods ? selectedMeal.foods : []
-    property var mealTotals: selectedMeal && selectedMeal.totals ? selectedMeal.total : ({calories: 0, protein: 0, carbs: 0, fat: 0})
 
     property var searchResults: []
 
@@ -33,12 +49,16 @@ Page {
     }
 
     function addCatalogFoodToMeal(foodItem) {
-        if(!foodItem || mealIndex < 0)
+        console.log("addCatalogFoodToMeal called -> mealIndex:", mealIndex,
+                    "name:", foodItem ? foodItem.name : "null")
+
+        if (!foodItem || mealIndex < 0)
         {
+            console.log("Add aborted: invalid foodItem or mealIndex")
             return
         }
 
-        nutritionVM.addFood(
+        nutritionVM.addFoodToMeal(
             mealIndex,
             foodItem.name,
             Number(foodItem.calories),
@@ -46,6 +66,8 @@ Page {
             Number(foodItem.carbs),
             Number(foodItem.fat)
         )
+
+        refreshMealData()
     }
 
     background: Rectangle {
@@ -54,13 +76,17 @@ Page {
 
     Component.onCompleted: {
         refreshSearch()
+        refreshMealData()
+        console.log("Page opened. mealIndex =", mealIndex, ", mealName =", mealName)
     }
 
     Connections {
         target: nutritionVM
 
         function onMealsChanged() {
+            console.log("mealsChanged received")
             refreshSearch()
+            refreshMealData()
         }
     }
 
@@ -117,6 +143,7 @@ Page {
             }
         }
 
+        //Meal summary
         Rectangle {
             Layout.fillWidth: true
             radius: 16
@@ -216,10 +243,10 @@ Page {
                                 }
 
                                 Label {
-                                    text: Number(modelData.calories).toFixed(0) + " Cal "
-                                        + Number(modelData.protein).toFixed(1) + " P "
-                                        + Number(modelData.carbs).toFixed(1) + " C "
-                                        + Number(modelData.fat).toFixed(1) + " F"
+                                    text: Number(modelData.calories).toFixed(0) + " Calories, "
+                                        + Number(modelData.protein).toFixed(1) + " g protein, "
+                                        + Number(modelData.carbs).toFixed(1) + " g carbs, "
+                                        + Number(modelData.fat).toFixed(1) + " g fat"
                                     color: "#A0A0A0"
                                     font.pixelSize: 13
                                     elide: Text.ElideRight
@@ -228,9 +255,32 @@ Page {
                             }
 
                             Button {
-                                text: "+"
                                 Layout.preferredWidth: 40
-                                onClicked: root.addCatalogFoodToMeal(modelData)
+                                Layout.preferredHeight: 40
+                                padding: 0
+
+                                background: Rectangle {
+                                    radius: width / 2
+                                    color: parent.down ? "#5A5A5A" : "#4A4A4A"
+                                    border.width: 0
+                                }
+
+                                contentItem: Item {
+                                    anchors.fill: parent
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "+"
+                                        color: "#FFFFFF"
+                                        font.pixelSize: 22
+                                        font.bold: true
+                                    }
+                                }
+
+                                onClicked: {
+                                    console.log("Plus clicked ->", modelData.name, "mealIndex:", mealIndex)
+                                    root.addCatalogFoodToMeal(modelData)
+                                }
                             }
                         }
                     }
@@ -238,6 +288,7 @@ Page {
             }
         }
 
+        //Added foods to meal
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -289,10 +340,10 @@ Page {
                                 }
 
                                 Label {
-                                    text: Number(modelData.calories).toFixed(0) + " Cal "
-                                        + Number(modelData.protein).toFixed(1) + " P "
-                                        + Number(modelData.carbs).toFixed(1) + " C "
-                                        + Number(modelData.fat).toFixed(1) + " F"
+                                    text: Number(modelData.calories).toFixed(0) + " Calories, "
+                                        + Number(modelData.protein).toFixed(1) + " g protein, "
+                                        + Number(modelData.carbs).toFixed(1) + " g carbs,  "
+                                        + Number(modelData.fat).toFixed(1) + " g fat"
                                     color: "#A0A0A0"
                                     font.pixelSize: 13
                                     Layout.fillWidth: true
@@ -301,8 +352,28 @@ Page {
                             }
 
                             Button {
-                                text: "🗑"
-                                Layout.preferredWidth: 44
+                                Layout.preferredWidth: 40
+                                Layout.preferredHeight: 40
+                                padding: 0
+
+                                background: Rectangle {
+                                    radius: width / 2
+                                    color: parent.down ? "#5A5A5A" : "#4A4A4A"
+                                    border.width: 0
+                                }
+
+                                contentItem: Item {
+                                    anchors.fill: parent
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "🗑️"
+                                        color: "#FFFFFF"
+                                        font.pixelSize: 24
+                                        font.bold: true
+                                    }
+                                }
+
                                 onClicked: nutritionVM.removeFood(mealIndex, index)
                             }
                         }

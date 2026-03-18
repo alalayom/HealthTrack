@@ -58,7 +58,7 @@ void NutritionViewModel::clearMeals()
     mService->clearMeals();
 }
 
-void NutritionViewModel::addFood(int pMealIndex, const QString &pName, double pCalories, double pProtein, double pCarbs, double pFat)
+void NutritionViewModel::addFoodToMeal(int pMealIndex, const QString &pName, double pCalories, double pProtein, double pCarbs, double pFat)
 {
     mService->addFood(pMealIndex, pName, pCalories, pProtein, pCarbs, pFat);
 }

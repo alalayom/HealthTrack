@@ -38,7 +38,7 @@ public:
     Q_INVOKABLE void removeMeal(int pMealIndex);
     Q_INVOKABLE void clearMeals();
 
-    Q_INVOKABLE void addFood(int pMealIndex, const QString& pName, double pCalories, double pProtein, double pCarbs, double pFat);
+    Q_INVOKABLE void addFoodToMeal(int pMealIndex, const QString& pName, double pCalories, double pProtein, double pCarbs, double pFat);
     Q_INVOKABLE void removeFood(int pMealIndex, int pFoodIndex);
     Q_INVOKABLE void clearFoods(int pMealIndex);
 

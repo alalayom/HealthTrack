@@ -7,6 +7,7 @@ NutritionService::NutritionService(DatabaseManager* pDatabaseManager, QObject *p
     , mDaily(QDate::currentDate())
 {
     loadCurrentDay();
+    ensureDefaultMeals();
 }
 
 const DailyEntry &NutritionService::dailyEntry() const noexcept
@@ -27,6 +28,7 @@ void NutritionService::setDate(const QDate &pDate)
     }
 
     mDaily = mRepository.loadDailyEntry(pDate);
+    ensureDefaultMeals();
 
     emit dateChanged();
     emit mealsChanged();
@@ -272,4 +274,19 @@ QVariantMap NutritionService::mealToVariant(const MealEntry &pMeal)
     tMap["totals"] = tTotals;
 
     return tMap;
+}
+
+void NutritionService::ensureDefaultMeals()
+{
+    if(!mDaily.getMeals().isEmpty())
+    {
+        return;
+    }
+
+    mDaily.addMeal(MealEntry("Breakfast"));
+    mDaily.addMeal(MealEntry("Lunch"));
+    mDaily.addMeal(MealEntry("Dinner"));
+    mDaily.addMeal(MealEntry("Snack"));
+
+    saveCurrentDay();
 }

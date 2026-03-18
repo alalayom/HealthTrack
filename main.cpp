@@ -190,8 +190,8 @@ static void runNutritionViewModelTests()
     tViewModel.addMeal("Breakfast");
     tViewModel.addMeal("Dinner");
 
-    tViewModel.addFood(0, "Egg", 155.0, 13.0, 1.1, 11.0);
-    tViewModel.addFood(1, "Oatmeal", 68.0, 2.4, 12.0, 1.4);
+    tViewModel.addFoodToMeal(0, "Egg", 155.0, 13.0, 1.1, 11.0);
+    tViewModel.addFoodToMeal(1, "Oatmeal", 68.0, 2.4, 12.0, 1.4);
 
     qDebug() << "VM meals:";
     const QVariantList tMeals = tViewModel.getMeals();

@@ -60,6 +60,8 @@ private:
     static QVariantMap foodToVariant(const FoodEntry& pFood);
     static QVariantMap mealToVariant(const MealEntry& pMeal);
 
+    void ensureDefaultMeals();
+
     DatabaseManager* mDatabaseManager = nullptr;
     NutritionRepository mRepository;
     DailyEntry mDaily;
