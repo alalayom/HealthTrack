@@ -10,25 +10,17 @@ Item {
 
     // Added dummy data for testing qml page design. Later data will be provided from ViewModel
     property string selectedDateText: "Today"
-    property int caloriesEaten: 1291
+
     property int caloriesBurned: 244
     property int caloriesGoal: 2117
-    property int caloriesRemaining: caloriesGoal - caloriesEaten + caloriesBurned
 
-    property int carbsCurrent: 206
     property int carbsGoal: 258
-    property int proteinCurrent: 35
     property int proteinGoal: 103
-    property int fatCurrent: 32
     property int fatGoal: 68
 
-    property int breakfastCurrent: 56
     property int breakfastGoal: 635
-    property int lunchCurrent: 856
     property int lunchGoal: 847
-    property int dinnerCurrent: 379
     property int dinnerGoal: 529
-    property int snacksCurrent: 0
     property int snacksGoal: 106
 
     property int waterCurrentMl: 1200
@@ -38,6 +30,92 @@ Item {
     property real weightGoalKg: 72.0
 
     property int stepsToday: 6421
+
+
+    //Real properties for mealData
+    property var nutritionVM: appController.nutritionViewModel
+
+    property int caloriesEaten: Math.round(Number(nutritionVM.totalCalories))
+    property int caloriesRemaining: caloriesGoal - caloriesEaten + caloriesBurned
+
+    property int carbsCurrent: 0
+    property int proteinCurrent: 0
+    property int fatCurrent: 0
+
+    property int breakfastCurrent: 0
+    property int lunchCurrent: 0
+    property int dinnerCurrent: 0
+    property int snacksCurrent: 0
+
+    function refreshDailyNutritionTotals() {
+
+        caloriesEaten = Math.round(Number(nutritionVM.totalCalories))
+        carbsCurrent = Math.round(Number(nutritionVM.totalCarbs))
+        proteinCurrent = Math.round(Number(nutritionVM.totalProtein))
+        fatCurrent = Math.round(Number(nutritionVM.totalFat))
+
+        console.log("Daily totals refreshed:",
+                    "cal:", caloriesEaten,
+                    "carbs:", carbsCurrent,
+                    "protein:", proteinCurrent,
+                    "fat:", fatCurrent
+        )
+    }
+
+    function refreshMealSummaries() {
+        const tMeals = nutritionVM.meals
+
+        breakfastCurrent = (tMeals.length > 0 && tMeals[0].totals)
+                ? Math.round(Number(tMeals[0].totals.calories))
+                : 0
+
+        lunchCurrent = (tMeals.length > 1 && tMeals[1].totals)
+                ? Math.round(Number(tMeals[1].totals.calories))
+                : 0
+
+        dinnerCurrent = (tMeals.length > 2 && tMeals[2].totals)
+                ? Math.round(Number(tMeals[2].totals.calories))
+                : 0
+
+        snacksCurrent = (tMeals.length > 3 && tMeals[3].totals)
+                ? Math.round(Number(tMeals[3].totals.calories))
+                : 0
+
+        console.log("NutritionMain refreshed:",
+                    breakfastCurrent,
+                    lunchCurrent,
+                    dinnerCurrent,
+                    snacksCurrent)
+    }
+
+    Component.onCompleted: {
+        refreshMealSummaries()
+        refreshDailyNutritionTotals()
+    }
+
+    Connections {
+        target: nutritionVM
+
+        function onMealsChanged() {
+            refreshMealSummaries()
+        }
+
+        function onTotalCaloriesChanged() {
+            refreshDailyNutritionTotals()
+        }
+
+        function onTotalCarbsChanged() {
+            refreshDailyNutritionTotals()
+        }
+
+        function onTotalProteinChanged() {
+            refreshDailyNutritionTotals()
+        }
+
+        function onTotalFatChanged() {
+            refreshDailyNutritionTotals()
+        }
+    }
 
     // Style
     readonly property color bg: "#121212"
