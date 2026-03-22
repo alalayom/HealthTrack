@@ -8,6 +8,8 @@ AppController::AppController(QObject *pParent)
     , mNavigationManager(this)
     , mNutritionService(&mDatabaseManager, this)
     , mNutritionViewModel(&mNutritionService, this)
+    , mWaterService(&mDatabaseManager, this)
+    , mWaterViewModel(&mWaterService, this)
 {
 
 }
@@ -26,19 +28,24 @@ bool AppController::initialize(bool pDevResetDatabase)
     return true;
 }
 
-AppState *AppController::getAppState()
+AppState* AppController::getAppState()
 {
     return &mAppState;
 }
 
-NavigationManager *AppController::getNavigationManager()
+NavigationManager* AppController::getNavigationManager()
 {
     return &mNavigationManager;
 }
 
-NutritionViewModel *AppController::getNutritionViewModel()
+NutritionViewModel* AppController::getNutritionViewModel()
 {
     return &mNutritionViewModel;
+}
+
+WaterViewModel* AppController::getWaterViewModel()
+{
+    return &mWaterViewModel;
 }
 
 void AppController::setupDependencies()
@@ -50,7 +57,7 @@ void AppController::setupDependencies()
         [this](const QDate& pDate)
         {
             mNutritionViewModel.setDate(pDate);
+            mWaterViewModel.setDate(pDate);
         }
     );
-
 }

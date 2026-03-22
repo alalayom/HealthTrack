@@ -12,6 +12,9 @@
 #include "../features/nutrition/nutritionservice.h"
 #include "../features/nutrition/nutritionviewmodel.h"
 
+#include "../features/hydration/waterservice.h"
+#include "../features/hydration/waterviewmodel.h"
+
 class AppController : public QObject
 {
     Q_OBJECT
@@ -19,6 +22,7 @@ class AppController : public QObject
     Q_PROPERTY(AppState* appState READ getAppState CONSTANT)
     Q_PROPERTY(NavigationManager* navigationManager READ getNavigationManager CONSTANT)
     Q_PROPERTY(NutritionViewModel* nutritionViewModel READ getNutritionViewModel CONSTANT)
+    Q_PROPERTY(WaterViewModel* waterViewModel READ getWaterViewModel CONSTANT)
 
 public:
     explicit AppController(QObject* pParent = nullptr);
@@ -28,6 +32,7 @@ public:
     AppState* getAppState();
     NavigationManager* getNavigationManager();
     NutritionViewModel* getNutritionViewModel();
+    WaterViewModel* getWaterViewModel();
 
 private:
     void setupDependencies();
@@ -36,9 +41,12 @@ private:
     AppSettingsManager mAppSettingsManager;
     AppState mAppState;
     NavigationManager mNavigationManager;
+
     NutritionService mNutritionService;
     NutritionViewModel mNutritionViewModel;
 
+    WaterService mWaterService;
+    WaterViewModel mWaterViewModel;
 };
 
 #endif // APPCONTROLLER_H

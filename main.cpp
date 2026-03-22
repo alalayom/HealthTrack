@@ -11,9 +11,13 @@
 #include <qsqlerror.h>
 #include <qsqlquery.h>
 
+#include "src/core/databasemanager.h"
+
 #include "src/features/nutrition/nutritionservice.h"
 #include "src/features/nutrition/nutritionviewmodel.h"
-#include "src/core/databasemanager.h"
+
+#include "src/features/hydration/waterservice.h"
+#include "src/features/hydration/waterviewmodel.h"
 
 void testInsertFood()
 {
@@ -209,6 +213,94 @@ static void runNutritionViewModelTests()
     qDebug() << "================ VIEWMODEL TEST END =================";
 }
 
+static void runWaterServiceTests()
+{
+    qDebug() << "================ WATER SERVICE TEST START ================";
+
+    DatabaseManager tDatabaseManager;
+    WaterService tService(&tDatabaseManager);
+
+    qDebug() << "Initial date:" << tService.getDate();
+    qDebug() << "Initial amount:" << tService.getCurrentAmountMl();
+    qDebug() << "Initial goal:" << tService.getGoalAmountMl();
+    qDebug() << "Initial remaining:" << tService.getRemainingAmountMl();
+    qDebug() << "Initial progress:" << tService.progress();
+
+    tService.setGoalAmountMl(2500);
+    qDebug() << "Goal after setGoalAmountMl(2500):" << tService.getGoalAmountMl();
+
+    tService.addWater(250);
+    qDebug() << "After addWater(250):" << tService.getCurrentAmountMl();
+
+    tService.addWater(500);
+    qDebug() << "After addWater(500):" << tService.getCurrentAmountMl();
+
+    tService.removeWater(250);
+    qDebug() << "After removeWater(250):" << tService.getCurrentAmountMl();
+
+    tService.setWaterAmount(1200);
+    qDebug() << "After setWaterAmount(1200):" << tService.getCurrentAmountMl();
+    qDebug() << "Remaining after setWaterAmount(1200):" << tService.getRemainingAmountMl();
+    qDebug() << "Progress after setWaterAmount(1200):" << tService.progress();
+
+    WaterService tReloadedService(&tDatabaseManager);
+    qDebug() << "Reloaded current amount:" << tReloadedService.getCurrentAmountMl();
+    qDebug() << "Reloaded remaining:" << tReloadedService.getRemainingAmountMl();
+    qDebug() << "Reloaded progress:" << tReloadedService.progress();
+
+    tReloadedService.resetWater();
+    qDebug() << "After resetWater() reloaded service amount:" << tReloadedService.getCurrentAmountMl();
+
+    WaterService tResetCheckService(&tDatabaseManager);
+    qDebug() << "Reset check reloaded amount:" << tResetCheckService.getCurrentAmountMl();
+
+    qDebug() << "================ WATER SERVICE TEST END ==================";
+}
+
+static void runWaterViewModelTests()
+{
+    qDebug() << "================ WATER VIEWMODEL TEST START ================";
+
+    DatabaseManager tDatabaseManager;
+    WaterService tService(&tDatabaseManager);
+    WaterViewModel tViewModel(&tService);
+
+    tViewModel.setGoalAmountMl(2000);
+    tViewModel.setSelectedCupAmountMl(250);
+
+    qDebug() << "VM date:" << tViewModel.getDate();
+    qDebug() << "VM goalAmountMl:" << tViewModel.getGoalAmountMl();
+    qDebug() << "VM selectedCupAmountMl:" << tViewModel.getSelectedCupAmountMl();
+    qDebug() << "VM targetCupCount:" << tViewModel.getTargetCupCount();
+    qDebug() << "VM currentAmountMl:" << tViewModel.getCurrentAmountMl();
+    qDebug() << "VM filledCupCount:" << tViewModel.getFilledCupCount();
+
+    tViewModel.addSelectedCup();
+    qDebug() << "After addSelectedCup currentAmountMl:" << tViewModel.getCurrentAmountMl();
+    qDebug() << "After addSelectedCup filledCupCount:" << tViewModel.getFilledCupCount();
+
+    tViewModel.addSelectedCup();
+    qDebug() << "After second addSelectedCup currentAmountMl:" << tViewModel.getCurrentAmountMl();
+    qDebug() << "After second addSelectedCup filledCupCount:" << tViewModel.getFilledCupCount();
+
+    tViewModel.toggleCup(3);
+    qDebug() << "After toggleCup(3) currentAmountMl:" << tViewModel.getCurrentAmountMl();
+    qDebug() << "After toggleCup(3) filledCupCount:" << tViewModel.getFilledCupCount();
+
+    tViewModel.toggleCup(1);
+    qDebug() << "After toggleCup(1) currentAmountMl:" << tViewModel.getCurrentAmountMl();
+    qDebug() << "After toggleCup(1) filledCupCount:" << tViewModel.getFilledCupCount();
+
+    qDebug() << "VM remainingAmountMl:" << tViewModel.getRemainingAmountMl();
+    qDebug() << "VM progress:" << tViewModel.getProgress();
+
+    tViewModel.resetWater();
+    qDebug() << "After reset VM currentAmountMl:" << tViewModel.getCurrentAmountMl();
+    qDebug() << "After reset VM filledCupCount:" << tViewModel.getFilledCupCount();
+
+    qDebug() << "================ WATER VIEWMODEL TEST END ==================";
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -236,6 +328,8 @@ int main(int argc, char *argv[])
     //testInsertFood();
     //runNutritionServiceTests();
     //runNutritionViewModelTests();
+    // runWaterServiceTests();
+    // runWaterViewModelTests();
 
     //Application engine
     QQmlApplicationEngine engine;

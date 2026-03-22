@@ -92,6 +92,11 @@ bool DatabaseManager::deleteTablesForTest()
         return false;
     }
 
+    if(!tQuery.exec("DROP TABLE IF EXISTS water_entries;"))
+    {
+        return false;
+    }
+
     if(!tQuery.exec("DROP TABLE IF EXISTS foods;"))
     {
         return false;
@@ -277,8 +282,17 @@ bool DatabaseManager::createTables()
         return false;
     }
 
+    if(!tQuery.exec(R"(
+        CREATE TABLE IF NOT EXISTS water_entries (
+            date TEXT PRIMARY KEY,
+            amount_ml INTEGER NOT NULL DEFAULT 0
+        )
+    )"))
+    {
+        qCritical() << "Faield to create water_entries:" << tQuery.lastError().text();
+        return false;
+    }
+
     //TODO: Add all db tables from here
     return true;
 }
-
-
