@@ -8,7 +8,6 @@ WaterService::WaterService(DatabaseManager *pDatabaseManager, QObject *pParent)
     , mRepository(pDatabaseManager)
     , mWater(QDate::currentDate())
 {
-    loadCurrentDay();
 }
 
 const WaterEntry &WaterService::waterEntry() const noexcept

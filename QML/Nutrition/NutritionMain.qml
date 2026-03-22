@@ -23,9 +23,6 @@ Item {
     property int dinnerGoal: 529
     property int snacksGoal: 106
 
-    property int waterCurrentMl: 1200
-    property int waterGoalMl: 2500
-
     property real weightCurrentKg: 78.4
     property real weightGoalKg: 72.0
 
@@ -34,6 +31,7 @@ Item {
 
     //Real properties for mealData
     property var nutritionVM: appController.nutritionViewModel
+    property var waterVM: appController.waterViewModel
 
     property int caloriesEaten: Math.round(Number(nutritionVM.totalCalories))
     property int caloriesRemaining: caloriesGoal - caloriesEaten + caloriesBurned
@@ -47,6 +45,17 @@ Item {
     property int dinnerCurrent: 0
     property int snacksCurrent: 0
 
+    property int waterCurrentMl: waterVM ? waterVM.currentAmountMl : 0
+    property int waterGoalMl: waterVM ? waterVM.goalAmountMl : 0
+    property int waterSelectedCupMl: waterVM ? waterVM.selectedCupAmountMl : 250
+    property int waterFilledCupCount: waterVM ? waterVM.filledCupCount : 0
+    property int waterTargetCupCount: waterVM ? waterVM.targetCupCount : 0
+    property bool hasShownWaterGoalOverlay: false
+
+    property int waterVisibleCupCount: Math.max(waterTargetCupCount, waterFilledCupCount < waterTargetCupCount
+        ? waterTargetCupCount : waterFilledCupCount + 1
+    )
+
     function refreshDailyNutritionTotals() {
 
         caloriesEaten = Math.round(Number(nutritionVM.totalCalories))
@@ -54,12 +63,12 @@ Item {
         proteinCurrent = Math.round(Number(nutritionVM.totalProtein))
         fatCurrent = Math.round(Number(nutritionVM.totalFat))
 
-        console.log("Daily totals refreshed:",
-                    "cal:", caloriesEaten,
-                    "carbs:", carbsCurrent,
-                    "protein:", proteinCurrent,
-                    "fat:", fatCurrent
-        )
+        // console.log("Daily totals refreshed:",
+        //             "cal:", caloriesEaten,
+        //             "carbs:", carbsCurrent,
+        //             "protein:", proteinCurrent,
+        //             "fat:", fatCurrent
+        // )
     }
 
     function refreshMealSummaries() {
@@ -81,11 +90,7 @@ Item {
                 ? Math.round(Number(tMeals[3].totals.calories))
                 : 0
 
-        console.log("NutritionMain refreshed:",
-                    breakfastCurrent,
-                    lunchCurrent,
-                    dinnerCurrent,
-                    snacksCurrent)
+        // console.log("NutritionMain refreshed:", breakfastCurrent, lunchCurrent, dinnerCurrent, snacksCurrent)
     }
 
     Component.onCompleted: {
@@ -510,11 +515,33 @@ Item {
                 border.width: 1
                 implicitHeight: waterContent.implicitHeight + 32
 
+                Connections {
+                    target: waterVM
+
+                    function onCurrentAmountMlChanged() {
+                        if (!waterVM)
+                        {
+                            return
+                        }
+
+                        if (waterCurrentMl >= waterGoalMl && !hasShownWaterGoalOverlay)
+                        {
+                            hasShownWaterGoalOverlay = true
+                            greatJobOverlayAnimation.restart()
+                        }
+
+                        if (waterCurrentMl < waterGoalMl)
+                        {
+                            hasShownWaterGoalOverlay = false
+                        }
+                    }
+                }
+
                 ColumnLayout {
                     id: waterContent
                     anchors.fill: parent
                     anchors.margins: 16
-                    spacing: 10
+                    spacing: 12
 
                     RowLayout {
                         Layout.fillWidth: true
@@ -531,7 +558,8 @@ Item {
                             }
 
                             Label {
-                                text: (waterCurrentMl/1000).toFixed(1) + " / " + (waterGoalMl/1000).toFixed(1) + " L"
+                                text: (waterCurrentMl / 1000).toFixed(1) + " / "
+                                      + (waterGoalMl / 1000).toFixed(1) + " L"
                                 color: textSecondary
                                 font.pixelSize: 14
                             }
@@ -541,38 +569,109 @@ Item {
                             Layout.fillWidth: true
                         }
 
-                        Button {
-                            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                            Layout.preferredWidth: 44
-                            Layout.preferredHeight: 44
-                            padding: 0
-
-                            background: Rectangle {
-                                radius: 22
-                                color: parent.down ? "#505050" : "#3A3A3A"
-                            }
-
-                            contentItem: Item {
-                                anchors.fill: parent
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "+"
-                                    color: textPrimary
-                                    font.pixelSize: 24
-                                    font.bold: true
-                                }
-                            }
-
-                            onClicked: console.log("TODO: Add water")
+                        Label {
+                            text: Math.min(100, Math.round(waterCurrentMl / Math.max(1, waterGoalMl) * 100)) + "%"
+                            color: textSecondary
+                            font.pixelSize: 13
+                            font.bold: true
                         }
                     }
 
                     ProgressBar {
                         Layout.fillWidth: true
                         from: 0
-                        to: waterGoalMl
-                        value: Math.min(waterGoalMl, waterCurrentMl)
+                        to: Math.max(1, waterGoalMl)
+                        value: Math.min(waterCurrentMl, waterGoalMl)
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        Label {
+                            text: waterSelectedCupMl + " mL / cup"
+                            color: textSecondary
+                            font.pixelSize: 13
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                        }
+
+                        Label {
+                            text: waterFilledCupCount + " / " + waterTargetCupCount + " cups"
+                            color: textSecondary
+                            font.pixelSize: 13
+                        }
+                    }
+
+                    Flow {
+                        Layout.fillWidth: true
+                        width: parent.width
+                        spacing: 8
+
+                        Repeater {
+                            model: waterVisibleCupCount
+
+                            delegate: Rectangle {
+                                required property int index
+
+                                width: 26
+                                height: 26
+                                radius: 8
+
+                                readonly property bool isFilled: index < waterFilledCupCount
+                                readonly property bool isExtraCup: index >= waterTargetCupCount
+
+                                color: {
+                                    if (isFilled && isExtraCup)
+                                    {
+                                        return "#2DA8FF"
+                                    }
+
+                                    if (isFilled)
+                                    {
+                                        return "#2DA8FF"
+                                    }
+
+                                    if (isExtraCup)
+                                    {
+                                        return Qt.rgba(1, 1, 1, 0.18)
+                                    }
+
+                                    return "#F2F2F2"
+                                }
+
+                                border.width: 1
+                                border.color: {
+                                    if (isFilled)
+                                    {
+                                        return "#2DA8FF"
+                                    }
+
+                                    if (isExtraCup)
+                                    {
+                                        return Qt.rgba(1, 1, 1, 0.25)
+                                    }
+
+                                    return "#D0D0D0"
+                                }
+
+                                opacity: isExtraCup && !isFilled ? 0.65 : 1.0
+
+                                MouseArea {
+                                    anchors.fill: parent
+
+                                    onClicked: {
+                                        if (!waterVM)
+                                        {
+                                            return
+                                        }
+
+                                        waterVM.toggleCup(index)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -910,6 +1009,92 @@ Item {
             // Bottom spacing
             Item {
                 Layout.preferredHeight: 24
+            }
+        }
+    }
+
+    //Water greatJob label
+    Label {
+        id: greatJobOverlay
+        anchors.centerIn: parent
+        z: 999
+
+        text: "Great job 💧"
+        color: "#4DB6FF"
+        font.pixelSize: 34
+        font.bold: true
+
+        opacity: 0
+        scale: 0.85
+
+        transform: Translate {
+            id: greatJobTranslate
+            y: 24
+        }
+    }
+
+    //Water greatJob animation
+    SequentialAnimation {
+        id: greatJobOverlayAnimation
+
+        ScriptAction {
+            script: {
+                greatJobOverlay.opacity = 0
+                greatJobOverlay.scale = 0.85
+                greatJobTranslate.y = 24
+            }
+        }
+
+        ParallelAnimation {
+            PropertyAnimation {
+                target: greatJobOverlay
+                property: "opacity"
+                from: 0
+                to: 1
+                duration: 220
+            }
+
+            PropertyAnimation {
+                target: greatJobOverlay
+                property: "scale"
+                from: 0.85
+                to: 1.0
+                duration: 260
+            }
+
+            PropertyAnimation {
+                target: greatJobTranslate
+                property: "y"
+                from: 24
+                to: 0
+                duration: 260
+            }
+        }
+
+        PauseAnimation {
+            duration: 1100
+        }
+
+        ParallelAnimation {
+            PropertyAnimation {
+                target: greatJobOverlay
+                property: "opacity"
+                to: 0
+                duration: 380
+            }
+
+            PropertyAnimation {
+                target: greatJobOverlay
+                property: "scale"
+                to: 0.96
+                duration: 380
+            }
+
+            PropertyAnimation {
+                target: greatJobTranslate
+                property: "y"
+                to: -14
+                duration: 380
             }
         }
     }

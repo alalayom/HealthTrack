@@ -6,7 +6,6 @@ NutritionService::NutritionService(DatabaseManager* pDatabaseManager, QObject *p
     , mRepository(pDatabaseManager)
     , mDaily(QDate::currentDate())
 {
-    loadCurrentDay();
     ensureDefaultMeals();
 }
 

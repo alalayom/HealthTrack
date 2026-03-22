@@ -24,6 +24,9 @@ bool AppController::initialize(bool pDevResetDatabase)
 
     setupDependencies();
 
+    mNutritionViewModel.setDate(mAppState.getSelectedDate());
+    mWaterViewModel.setDate(mAppState.getSelectedDate());
+
     qDebug() << "AppController initialized successfully.";
     return true;
 }
