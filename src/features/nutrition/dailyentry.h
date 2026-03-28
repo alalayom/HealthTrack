@@ -14,10 +14,9 @@ public:
     ~DailyEntry();
 
     const QDate& getDate() const noexcept;
-    const QList<MealEntry>& getMeals() const noexcept;
-
     void setDate(QDate pDate);
 
+    const QList<MealEntry>& getMeals() const noexcept;
     void addMeal(MealEntry pMeal);
     void removeMeal(int pIndex);
     void clearMeals() noexcept;

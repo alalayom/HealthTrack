@@ -24,11 +24,14 @@ qt_add_qml_module(appHealthTrack
     URI HealthTrack
     VERSION 1.0
     QML_FILES
+
         QML/Main/Main.qml
         QML/Main/LoginPage.qml
         QML/Main/HomeScreen.qml
 
         QML/Nutrition/NutritionMain.qml
+        QML/Nutrition/MealDetails.qml
+        QML/Nutrition/AddFood.qml
 
         QML/Sport/SportMain.qml
 
@@ -39,6 +42,10 @@ qt_add_qml_module(appHealthTrack
         QML/Settings/SettingsMain.qml
 
         QML/Statistics/StatisticsMain.qml
+
+        SOURCES src/app/appcontroller.h src/app/appcontroller.cpp
+        SOURCES src/app/navigationmanager.h src/app/navigationmanager.cpp
+        SOURCES src/app/appstate.h src/app/appstate.cpp
 
         SOURCES src/core/databasemanager.h src/core/databasemanager.cpp
         SOURCES src/core/appsettingsmanager.h src/core/appsettingsmanager.cpp
@@ -79,11 +86,16 @@ qt_add_qml_module(appHealthTrack
         SOURCES src/features/statistics/statisticsviewmodel.h src/features/statistics/statisticsviewmodel.cpp
         SOURCES src/features/statistics/statisticsrepository.h src/features/statistics/statisticsrepository.cpp
 
-        SOURCES src/app/appcontroller.h src/app/appcontroller.cpp
-        SOURCES src/app/navigationmanager.h src/app/navigationmanager.cpp
-        SOURCES src/app/appstate.h src/app/appstate.cpp
-        QML_FILES QML/Nutrition/MealDetails.qml
-        QML_FILES QML/Nutrition/AddFood.qml
+        SOURCES src/features/bodymetrics/bodymeasuremententry.h src/features/bodymetrics/bodymeasuremententry.cpp
+        SOURCES src/features/bodymetrics/bodycompositionmetrics.h src/features/bodymetrics/bodycompositionmetrics.cpp
+        SOURCES src/features/bodymetrics/segmentmetrics.h src/features/bodymetrics/segmentmetrics.cpp
+        SOURCES src/features/bodymetrics/bodymetricsrepository.h src/features/bodymetrics/bodymetricsrepository.cpp
+        SOURCES src/features/bodymetrics/bodysegmentanalysis.h src/features/bodymetrics/bodysegmentanalysis.cpp
+        SOURCES src/features/bodymetrics/bodymetricsservice.h src/features/bodymetrics/bodymetricsservice.cpp
+        SOURCES src/features/bodymetrics/bodymetricsviewmodel.h src/features/bodymetrics/bodymetricsviewmodel.cpp
+
+
+
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

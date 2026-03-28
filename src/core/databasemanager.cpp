@@ -245,6 +245,70 @@ bool DatabaseManager::createTables()
         return false;
     }
 
+    //water_entries table
+    if(!tQuery.exec(R"(
+        CREATE TABLE IF NOT EXISTS water_entries (
+            date TEXT PRIMARY KEY,
+            amount_ml INTEGER NOT NULL DEFAULT 0
+        )
+    )"))
+    {
+        qCritical() << "Faield to create water_entries:" << tQuery.lastError().text();
+        return false;
+    }
+
+    //body_measurements table
+    if(!tQuery.exec(R"(
+        CREATE TABLE IF NOT EXISTS body_measurements(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            measurement_date TEXT NOT NULL UNIQUE
+        )
+    )"))
+    {
+        qCritical() << "Failed to create body_measurements:" << tQuery.lastError().text();
+        return false;
+    }
+
+    //body_composition_metrics table
+    if(!tQuery.exec(R"(
+        CREATE TABLE IF NOT EXISTS body_composition_metrics (
+            measurement_id INTEGER PRIMARY KEY,
+            weight_kg REAL NOT NULL,
+            muscle_mass_kg REAL NOT NULL,
+            muscle_percentage REAL NOT NULL,
+            fat_mass_kg REAL NOT NULL,
+            fat_percentage REAL NOT NULL,
+            lean_mass_kg REAL NOT NULL,
+            body_water_mass_kg REAL NOT NULL,
+            body_water_percentage REAL NOT NULL,
+            bmi REAL NULL,
+            bmr REAL NULL,
+            FOREIGN KEY(measurement_id) REFERENCES body_measurement(id) ON DELETE CASCADE
+        )
+    )"))
+    {
+        qCritical() << "Failed to create body_composition_metrics:" << tQuery.lastError().text();
+        return false;
+    }
+
+    if(!tQuery.exec(R"(
+        CREATE TABLE IF NOT EXISTS body_segment_metrics (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            measurement_id INTEGER NOT NULL,
+            segment_name TEXT NOT NULL,
+            muscle_mass_kg REAL NOT NULL,
+            fat_mass_kg REAL NOT NULL,
+            fat_percentage REAL NOT NULL,
+            lean_mass_kg REAL NOT NULL,
+            FOREIGN KEY(measurement_id) REFERENCES body_measurements(id) ON DELETE CASCADE
+            UNIQUE(measurement_id, segment_name)
+        )
+    )"))
+    {
+        qCritical() << "Failed to create body_segment_metrics:" << tQuery.lastError().text();
+        return false;
+    }
+
     //Indexes for foreign keys
     if(!tQuery.exec(R"(
         CREATE INDEX IF NOT EXISTS idx_meal_daily_id
@@ -283,13 +347,29 @@ bool DatabaseManager::createTables()
     }
 
     if(!tQuery.exec(R"(
-        CREATE TABLE IF NOT EXISTS water_entries (
-            date TEXT PRIMARY KEY,
-            amount_ml INTEGER NOT NULL DEFAULT 0
-        )
+        CREATE INDEX IF NOT EXISTS idx_body_composition_measurement_id
+        ON body_composition_metrics(measurement_id)
     )"))
     {
-        qCritical() << "Faield to create water_entries:" << tQuery.lastError().text();
+        qCritical() << "Failed to create idx_body_composition_measurement_id:" << tQuery.lastError().text();
+        return false;
+    }
+
+    if(!tQuery.exec(R"(
+        CREATE INDEX IF NOT EXISTS idx_body_segment_measurement_id
+        ON body_segment_metrics(measurement_id)
+    )"))
+    {
+        qCritical() << "Failed to create idx_body_segment_measurement_id:" << tQuery.lastError().text();
+        return false;
+    }
+
+    if(!tQuery.exec(R"(
+        CREATE INDEX IF NOT EXISTS idx_body_segment_name
+        ON body_segment_metrics(segment_name)
+    )"))
+    {
+        qCritical() << "Failed to create idx_body_segment_name:" << tQuery.lastError().text();
         return false;
     }
 
