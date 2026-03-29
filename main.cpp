@@ -4,12 +4,12 @@
 #include <QQmlContext>
 #include <QQmlEngine>
 
-#include "src/app/appcontroller.h"
-#include "src/app/navigationmanager.h"
-
 #include <android/log.h>
 #include <qsqlerror.h>
 #include <qsqlquery.h>
+
+#include "src/app/appcontroller.h"
+#include "src/app/navigationmanager.h"
 
 #include "src/core/databasemanager.h"
 
@@ -18,6 +18,9 @@
 
 #include "src/features/hydration/waterservice.h"
 #include "src/features/hydration/waterviewmodel.h"
+
+#include "src/features/bodymetrics/bodymetricsservice.h"
+#include "src/features/bodymetrics/bodymetricsviewmodel.h"
 
 void testInsertFood()
 {
@@ -301,6 +304,185 @@ static void runWaterViewModelTests()
     qDebug() << "================ WATER VIEWMODEL TEST END ==================";
 }
 
+static void runBodyMetricsServiceTests()
+{
+    qDebug() << "================ BODY METRICS SERVICE TEST START ================";
+
+    DatabaseManager tDatabaseManager;
+    if(!tDatabaseManager.initialize(true))
+    {
+        qDebug() << "BodyMetricsService test database init failed.";
+        return;
+    }
+
+    BodyMetricsService tService(&tDatabaseManager);
+
+    qDebug() << "Initial date:" << tService.getDate();
+
+    qDebug() << "Initial composition:";
+    qDebug() << "  weightKg:" << tService.getComposition().getWeightKg();
+    qDebug() << "  muscleMassKg:" << tService.getComposition().getMuscleMassKg();
+    qDebug() << "  musclePercentage:" << tService.getComposition().getMusclePercentage();
+    qDebug() << "  fatMassKg:" << tService.getComposition().getFatMassKg();
+    qDebug() << "  fatPercentage:" << tService.getComposition().getFatPercentage();
+    qDebug() << "  leanMassKg:" << tService.getComposition().getLeanMassKg();
+    qDebug() << "  bodyWaterMassKg:" << tService.getComposition().getBodyWaterMassKg();
+    qDebug() << "  bodyWaterPercentage:" << tService.getComposition().getBodyWaterPercentage();
+    qDebug() << "  bmi:" << tService.getComposition().getBmi();
+    qDebug() << "  bmr:" << tService.getComposition().getBmr();
+
+    tService.setWeightKg(85.1);
+    tService.setMuscleMassKg(66.1);
+    tService.setMusclePercentage(77.6);
+    tService.setFatMassKg(15.9);
+    tService.setFatPercentage(18.7);
+    tService.setLeanMassKg(69.2);
+    tService.setBodyWaterMassKg(50.7);
+    tService.setBodyWaterPercentage(59.6);
+    tService.setBmi(24.9);
+    tService.setBmr(2069.0);
+
+    qDebug() << "After composition updates:";
+    qDebug() << "  weightKg:" << tService.getComposition().getWeightKg();
+    qDebug() << "  muscleMassKg:" << tService.getComposition().getMuscleMassKg();
+    qDebug() << "  musclePercentage:" << tService.getComposition().getMusclePercentage();
+    qDebug() << "  fatMassKg:" << tService.getComposition().getFatMassKg();
+    qDebug() << "  fatPercentage:" << tService.getComposition().getFatPercentage();
+    qDebug() << "  leanMassKg:" << tService.getComposition().getLeanMassKg();
+    qDebug() << "  bodyWaterMassKg:" << tService.getComposition().getBodyWaterMassKg();
+    qDebug() << "  bodyWaterPercentage:" << tService.getComposition().getBodyWaterPercentage();
+    qDebug() << "  bmi:" << tService.getComposition().getBmi();
+    qDebug() << "  bmr:" << tService.getComposition().getBmr();
+
+    tService.setTrunkMetrics(SegmentMetrics(36.0, 9.1, 19.6, 37.4));
+    tService.setRightArmMetrics(SegmentMetrics(4.0, 0.8, 15.6, 4.2));
+    tService.setLeftArmMetrics(SegmentMetrics(4.1, 0.8, 15.3, 4.4));
+    tService.setRightLegMetrics(SegmentMetrics(11.2, 2.5, 17.6, 11.8));
+    tService.setLeftLegMetrics(SegmentMetrics(10.8, 2.7, 19.1, 11.4));
+
+    qDebug() << "After segment updates:";
+    qDebug() << "  trunk muscle/fat/fat%/lean:"
+             << tService.getSegmentAnalysis().getTrunk().getMuscleMassKg()
+             << tService.getSegmentAnalysis().getTrunk().getFatMassKg()
+             << tService.getSegmentAnalysis().getTrunk().getFatPercentage()
+             << tService.getSegmentAnalysis().getTrunk().getLeanMassKg();
+
+    qDebug() << "  rightArm muscle/fat/fat%/lean:"
+             << tService.getSegmentAnalysis().getRightArm().getMuscleMassKg()
+             << tService.getSegmentAnalysis().getRightArm().getFatMassKg()
+             << tService.getSegmentAnalysis().getRightArm().getFatPercentage()
+             << tService.getSegmentAnalysis().getRightArm().getLeanMassKg();
+
+    qDebug() << "  leftArm muscle/fat/fat%/lean:"
+             << tService.getSegmentAnalysis().getLeftArm().getMuscleMassKg()
+             << tService.getSegmentAnalysis().getLeftArm().getFatMassKg()
+             << tService.getSegmentAnalysis().getLeftArm().getFatPercentage()
+             << tService.getSegmentAnalysis().getLeftArm().getLeanMassKg();
+
+    qDebug() << "  rightLeg muscle/fat/fat%/lean:"
+             << tService.getSegmentAnalysis().getRightLeg().getMuscleMassKg()
+             << tService.getSegmentAnalysis().getRightLeg().getFatMassKg()
+             << tService.getSegmentAnalysis().getRightLeg().getFatPercentage()
+             << tService.getSegmentAnalysis().getRightLeg().getLeanMassKg();
+
+    qDebug() << "  leftLeg muscle/fat/fat%/lean:"
+             << tService.getSegmentAnalysis().getLeftLeg().getMuscleMassKg()
+             << tService.getSegmentAnalysis().getLeftLeg().getFatMassKg()
+             << tService.getSegmentAnalysis().getLeftLeg().getFatPercentage()
+             << tService.getSegmentAnalysis().getLeftLeg().getLeanMassKg();
+
+    qDebug() << "Manual save result:" << tService.saveCurrentMeasurement();
+
+    BodyMetricsService tReloadedService(&tDatabaseManager);
+    tReloadedService.setDate(QDate::currentDate());
+    qDebug() << "Reloaded date:" << tReloadedService.getDate();
+
+    qDebug() << "Reloaded composition:";
+    qDebug() << "  weightKg:" << tReloadedService.getComposition().getWeightKg();
+    qDebug() << "  muscleMassKg:" << tReloadedService.getComposition().getMuscleMassKg();
+    qDebug() << "  musclePercentage:" << tReloadedService.getComposition().getMusclePercentage();
+    qDebug() << "  fatMassKg:" << tReloadedService.getComposition().getFatMassKg();
+    qDebug() << "  fatPercentage:" << tReloadedService.getComposition().getFatPercentage();
+    qDebug() << "  leanMassKg:" << tReloadedService.getComposition().getLeanMassKg();
+    qDebug() << "  bodyWaterMassKg:" << tReloadedService.getComposition().getBodyWaterMassKg();
+    qDebug() << "  bodyWaterPercentage:" << tReloadedService.getComposition().getBodyWaterPercentage();
+    qDebug() << "  bmi:" << tReloadedService.getComposition().getBmi();
+    qDebug() << "  bmr:" << tReloadedService.getComposition().getBmr();
+
+    qDebug() << "Reloaded trunk muscle/fat/fat%/lean:"
+             << tReloadedService.getSegmentAnalysis().getTrunk().getMuscleMassKg()
+             << tReloadedService.getSegmentAnalysis().getTrunk().getFatMassKg()
+             << tReloadedService.getSegmentAnalysis().getTrunk().getFatPercentage()
+             << tReloadedService.getSegmentAnalysis().getTrunk().getLeanMassKg();
+
+    qDebug() << "Delete current measurement result:" << tReloadedService.deleteCurrentMeasurement();
+
+    BodyMetricsService tDeleteCheckService(&tDatabaseManager);
+    qDebug() << "After delete reloaded weight:" << tDeleteCheckService.getComposition().getWeightKg();
+    qDebug() << "After delete reloaded trunk muscle:" << tDeleteCheckService.getSegmentAnalysis().getTrunk().getMuscleMassKg();
+
+    qDebug() << "================ BODY METRICS SERVICE TEST END ==================";
+}
+
+static void runBodyMetricsViewModelTests()
+{
+    qDebug() << "================ BODY METRICS VIEWMODEL TEST START ================";
+
+    DatabaseManager tDatabaseManager;
+    if(!tDatabaseManager.initialize(true))
+    {
+        qDebug() << "BodyMetricsViewModel test database init failed.";
+        return;
+    }
+
+    BodyMetricsService tService(&tDatabaseManager);
+    BodyMetricsViewModel tViewModel(&tService);
+
+    qDebug() << "VM initial date:" << tViewModel.getDate();
+    qDebug() << "VM initial composition:" << tViewModel.getComposition();
+    qDebug() << "VM initial segmentAnalysis:" << tViewModel.getSegmentAnalysis();
+
+    tViewModel.setWeightKg(85.1);
+    tViewModel.setMuscleMassKg(66.1);
+    tViewModel.setMusclePercentage(77.6);
+    tViewModel.setFatMassKg(15.9);
+    tViewModel.setFatPercentage(18.7);
+    tViewModel.setLeanMassKg(69.2);
+    tViewModel.setBodyWaterMassKg(50.7);
+    tViewModel.setBodyWaterPercentage(59.6);
+    tViewModel.setBmi(24.9);
+    tViewModel.setBmr(2069.0);
+
+    qDebug() << "VM composition after updates:" << tViewModel.getComposition();
+
+    tViewModel.setTrunkMetrics(36.0, 9.1, 19.6, 37.4);
+    tViewModel.setRightArmMetrics(4.0, 0.8, 15.6, 4.2);
+    tViewModel.setLeftArmMetrics(4.1, 0.8, 15.3, 4.4);
+    tViewModel.setRightLegMetrics(11.2, 2.5, 17.6, 11.8);
+    tViewModel.setLeftLegMetrics(10.8, 2.7, 19.1, 11.4);
+
+    qDebug() << "VM segmentAnalysis after updates:" << tViewModel.getSegmentAnalysis();
+
+    qDebug() << "VM manual save result:" << tViewModel.saveCurrentMeasurement();
+
+    BodyMetricsService tReloadService(&tDatabaseManager);
+    tReloadService.setDate(QDate::currentDate());
+    BodyMetricsViewModel tReloadViewModel(&tReloadService);
+
+    qDebug() << "Reload VM composition:" << tReloadViewModel.getComposition();
+    qDebug() << "Reload VM segmentAnalysis:" << tReloadViewModel.getSegmentAnalysis();
+
+    qDebug() << "VM delete result:" << tReloadViewModel.deleteCurrentMeasurement();
+
+    BodyMetricsService tDeleteCheckService(&tDatabaseManager);
+    BodyMetricsViewModel tDeleteCheckViewModel(&tDeleteCheckService);
+
+    qDebug() << "Delete check composition:" << tDeleteCheckViewModel.getComposition();
+    qDebug() << "Delete check segmentAnalysis:" << tDeleteCheckViewModel.getSegmentAnalysis();
+
+    qDebug() << "================ BODY METRICS VIEWMODEL TEST END ==================";
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -324,12 +506,15 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    //Food insert and find test
+    //Insertion and find test
+
     //testInsertFood();
     //runNutritionServiceTests();
     //runNutritionViewModelTests();
-    // runWaterServiceTests();
-    // runWaterViewModelTests();
+    //runWaterServiceTests();
+    //runWaterViewModelTests();
+    // runBodyMetricsServiceTests();
+    // runBodyMetricsViewModelTests();
 
     //Application engine
     QQmlApplicationEngine engine;

@@ -31,6 +31,7 @@ bool BodyMetricsRepository::saveMeasurementEntry(const BodyMeasurementEntry &pEn
 
     if(!tDeleteCompositionQuery.exec())
     {
+        qCritical() << "delete body_composition_metrics failed:" << tDeleteCompositionQuery.lastError().text();
         mDatabaseManager->database().rollback();
         return false;
     }
@@ -39,8 +40,9 @@ bool BodyMetricsRepository::saveMeasurementEntry(const BodyMeasurementEntry &pEn
     tDeleteSegmentQuery.prepare("DELETE FROM body_segment_metrics WHERE measurement_id = ?");
     tDeleteSegmentQuery.addBindValue(tMeasurementId);
 
-    if(tDeleteSegmentQuery.exec())
+    if(!tDeleteSegmentQuery.exec())
     {
+        qCritical() << "delete body_segment_metrics failed:" << tDeleteSegmentQuery.lastError().text();
         mDatabaseManager->database().rollback();
         return false;
     }
@@ -216,6 +218,7 @@ int BodyMetricsRepository::ensureMeasurementId(const QDate &pDate)
 
     if(!tQuery.exec())
     {
+        qCritical() << "ensureMeasurementId insert failed:" << tQuery.lastError().text();
         return -1;
     }
 
@@ -253,7 +256,13 @@ bool BodyMetricsRepository::saveCompositionMetrics(int pMeasurementId, const Bod
     tQuery.addBindValue(pComposition.getBmi());
     tQuery.addBindValue(pComposition.getBmr());
 
-    return tQuery.exec();
+    if(!tQuery.exec())
+    {
+        qCritical() << "saveCompositionMetrics failed:" << tQuery.lastError().text();
+        return false;
+    }
+
+    return true;
 }
 
 bool BodyMetricsRepository::saveSegmentMetrics(int pMeasurementId, const QString &pSegmentName, const SegmentMetrics &pMetrics)
@@ -277,5 +286,11 @@ bool BodyMetricsRepository::saveSegmentMetrics(int pMeasurementId, const QString
     tQuery.addBindValue(pMetrics.getFatPercentage());
     tQuery.addBindValue(pMetrics.getLeanMassKg());
 
-    return tQuery.exec();
+    if(!tQuery.exec())
+    {
+        qCritical() << "saveSegmentMetrics failed:" << tQuery.lastError().text();
+        return false;
+    }
+
+    return true;
 }

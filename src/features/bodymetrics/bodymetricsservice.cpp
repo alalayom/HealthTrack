@@ -6,7 +6,7 @@ BodyMetricsService::BodyMetricsService(DatabaseManager *pDatabaseManager, QObjec
     , mRepository(pDatabaseManager)
     , mMeasurement()
 {
-
+    mMeasurement.setMeasurementDate(QDate::currentDate());
 }
 
 const BodyMeasurementEntry &BodyMetricsService::measurementEntry() const noexcept
@@ -21,14 +21,20 @@ QDate BodyMetricsService::getDate() const noexcept
 
 void BodyMetricsService::setDate(const QDate &pDate)
 {
-    if(mMeasurement.getMeasurementDate() == pDate)
-    {
-        return;
-    }
+    const bool tDateChanged = (mMeasurement.getMeasurementDate() != pDate);
 
     mMeasurement = mRepository.loadMeasurementEntry(pDate);
 
-    emit dateChanged();
+    if(mMeasurement.getMeasurementDate() != pDate)
+    {
+        mMeasurement.setMeasurementDate(pDate);
+    }
+
+    if(tDateChanged)
+    {
+        emit dateChanged();
+    }
+
     emit compositionChanged();
     emit segmentAnalysisChanged();
     emit measurementChanged();
@@ -86,7 +92,7 @@ void BodyMetricsService::setMuscleMassKg(double pMuscleMassKg)
     emit measurementChanged();
 }
 
-void BodyMetricsService::setMusclePecentage(double pMusclePercentage)
+void BodyMetricsService::setMusclePercentage(double pMusclePercentage)
 {
     BodyCompositionMetrics tComposition = mMeasurement.getComposition();
     tComposition.setMusclePercentage(pMusclePercentage);
@@ -293,16 +299,24 @@ bool BodyMetricsService::saveCurrentMeasurement()
 
 void BodyMetricsService::loadCurrentMeasurement()
 {
-    mMeasurement = mRepository.loadMeasurementEntry(mMeasurement.getMeasurementDate());
+    const QDate tDate = mMeasurement.getMeasurementDate();
+    mMeasurement = mRepository.loadMeasurementEntry(tDate);
+    mMeasurement.setMeasurementDate(tDate);
+
+    emit compositionChanged();
+    emit segmentAnalysisChanged();
+    emit measurementChanged();
 }
 
 bool BodyMetricsService::deleteCurrentMeasurement()
 {
-    const bool tSuccess = mRepository.deleteMeasurementEntry(mMeasurement.getMeasurementDate());
+    const QDate tDate = mMeasurement.getMeasurementDate();
+    const bool tSuccess = mRepository.deleteMeasurementEntry(tDate);
 
     if(tSuccess)
     {
         mMeasurement = BodyMeasurementEntry();
+        mMeasurement.setMeasurementDate(tDate);
 
         emit dateChanged();
         emit compositionChanged();

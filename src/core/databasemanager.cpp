@@ -117,12 +117,27 @@ bool DatabaseManager::deleteTablesForTest()
         return false;
     }
 
+    if(!tQuery.exec("DROP TABLE IF EXISTS body_segment_metrics;"))
+    {
+        return false;
+    }
+
+    if(!tQuery.exec("DROP TABLE IF EXISTS body_composition_metrics;"))
+    {
+        return false;
+    }
+
+    if(!tQuery.exec("DROP TABLE IF EXISTS body_measurements;"))
+    {
+        return false;
+    }
+
     if(!tQuery.exec("PRAGMA foreign_keys = ON;"))
     {
         return false;
     }
 
-    qDebug() << "All nutrition tables deleted (DEV MODE).";
+    qDebug() << "All tables deleted (DEV MODE).";
 
     return true;
 }
@@ -283,7 +298,7 @@ bool DatabaseManager::createTables()
             body_water_percentage REAL NOT NULL,
             bmi REAL NULL,
             bmr REAL NULL,
-            FOREIGN KEY(measurement_id) REFERENCES body_measurement(id) ON DELETE CASCADE
+            FOREIGN KEY(measurement_id) REFERENCES body_measurements(id) ON DELETE CASCADE
         )
     )"))
     {
@@ -300,7 +315,7 @@ bool DatabaseManager::createTables()
             fat_mass_kg REAL NOT NULL,
             fat_percentage REAL NOT NULL,
             lean_mass_kg REAL NOT NULL,
-            FOREIGN KEY(measurement_id) REFERENCES body_measurements(id) ON DELETE CASCADE
+            FOREIGN KEY(measurement_id) REFERENCES body_measurements(id) ON DELETE CASCADE,
             UNIQUE(measurement_id, segment_name)
         )
     )"))

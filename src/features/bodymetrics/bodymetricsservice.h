@@ -33,7 +33,7 @@ public:
 
     void setWeightKg(double pWeightKg);
     void setMuscleMassKg(double pMuscleMassKg);
-    void setMusclePecentage(double pMusclePercentage);
+    void setMusclePercentage(double pMusclePercentage);
     void setFatMassKg(double pFatMassKg);
     void setFatPercentage(double pFatPercentage);
     void setLeanMassKg(double pLeanMassKg);

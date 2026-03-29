@@ -1,8 +1,6 @@
 #ifndef BODYSEGMENTANALYSIS_H
 #define BODYSEGMENTANALYSIS_H
 
-#include <utility>
-
 #include "segmentmetrics.h"
 
 class BodySegmentAnalysis

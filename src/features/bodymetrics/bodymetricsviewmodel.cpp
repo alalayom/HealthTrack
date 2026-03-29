@@ -40,7 +40,7 @@ void BodyMetricsViewModel::setMuscleMassKg(double pMuscleMassKg)
 
 void BodyMetricsViewModel::setMusclePercentage(double pMusclePercentage)
 {
-    mService->setMusclePecentage(pMusclePercentage);
+    mService->setMusclePercentage(pMusclePercentage);
 }
 
 void BodyMetricsViewModel::setFatMassKg(double pFatMassKg)
@@ -80,27 +80,27 @@ void BodyMetricsViewModel::setBmr(double pBmr)
 
 void BodyMetricsViewModel::setTrunkMetrics(double pMuscleMassKg, double pFatMassKg, double pFatPercentage, double pLeanMassKg)
 {
-    mService->setTrunkMetrics(SegmentMetrics(pMuscleMassKg, pFatMassKg, pFatMassKg, pLeanMassKg));
+    mService->setTrunkMetrics(SegmentMetrics(pMuscleMassKg, pFatMassKg, pFatPercentage, pLeanMassKg));
 }
 
 void BodyMetricsViewModel::setRightArmMetrics(double pMuscleMassKg, double pFatMassKg, double pFatPercentage, double pLeanMassKg)
 {
-    mService->setRightArmMetrics(SegmentMetrics(pMuscleMassKg, pFatMassKg, pFatMassKg, pLeanMassKg));
+    mService->setRightArmMetrics(SegmentMetrics(pMuscleMassKg, pFatMassKg, pFatPercentage, pLeanMassKg));
 }
 
 void BodyMetricsViewModel::setLeftArmMetrics(double pMuscleMassKg, double pFatMassKg, double pFatPercentage, double pLeanMassKg)
 {
-    mService->setLeftArmMetrics(SegmentMetrics(pMuscleMassKg, pFatMassKg, pFatMassKg, pLeanMassKg));
+    mService->setLeftArmMetrics(SegmentMetrics(pMuscleMassKg, pFatMassKg, pFatPercentage, pLeanMassKg));
 }
 
 void BodyMetricsViewModel::setRightLegMetrics(double pMuscleMassKg, double pFatMassKg, double pFatPercentage, double pLeanMassKg)
 {
-    mService->setRightLegMetrics(SegmentMetrics(pMuscleMassKg, pFatMassKg, pFatMassKg, pLeanMassKg));
+    mService->setRightLegMetrics(SegmentMetrics(pMuscleMassKg, pFatMassKg, pFatPercentage, pLeanMassKg));
 }
 
 void BodyMetricsViewModel::setLeftLegMetrics(double pMuscleMassKg, double pFatMassKg, double pFatPercentage, double pLeanMassKg)
 {
-    mService->setLeftLegMetrics(SegmentMetrics(pMuscleMassKg, pFatMassKg, pFatMassKg, pLeanMassKg));
+    mService->setLeftLegMetrics(SegmentMetrics(pMuscleMassKg, pFatMassKg, pFatPercentage, pLeanMassKg));
 }
 
 bool BodyMetricsViewModel::saveCurrentMeasurement()

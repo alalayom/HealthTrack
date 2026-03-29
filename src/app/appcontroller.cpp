@@ -13,7 +13,15 @@ AppController::AppController(QObject *pParent)
     , mBodyMetricsService(&mDatabaseManager, this)
     , mBodyMetricsViewModel(&mBodyMetricsService, this)
 {
+    if(!mDatabaseManager.initialize(true))
+    {
+        qCritical() << "Database initialization failed.";
+        return;
+    }
 
+    mBodyMetricsService.setDate(QDate::currentDate());
+
+    qDebug() << "AppController initialized successfully.";
 }
 
 bool AppController::initialize(bool pDevResetDatabase)
