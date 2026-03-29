@@ -1,5 +1,6 @@
-#include "bodysegmentanalysis.h"
 #include <utility>
+
+#include "bodysegmentanalysis.h"
 
 BodySegmentAnalysis::BodySegmentAnalysis()
     : mTrunk()

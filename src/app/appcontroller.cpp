@@ -10,6 +10,8 @@ AppController::AppController(QObject *pParent)
     , mNutritionViewModel(&mNutritionService, this)
     , mWaterService(&mDatabaseManager, this)
     , mWaterViewModel(&mWaterService, this)
+    , mBodyMetricsService(&mDatabaseManager, this)
+    , mBodyMetricsViewModel(&mBodyMetricsService, this)
 {
 
 }
@@ -26,6 +28,7 @@ bool AppController::initialize(bool pDevResetDatabase)
 
     mNutritionViewModel.setDate(mAppState.getSelectedDate());
     mWaterViewModel.setDate(mAppState.getSelectedDate());
+    mBodyMetricsViewModel.setDate(mAppState.getSelectedDate());
 
     qDebug() << "AppController initialized successfully.";
     return true;
@@ -51,6 +54,11 @@ WaterViewModel* AppController::getWaterViewModel()
     return &mWaterViewModel;
 }
 
+BodyMetricsViewModel* AppController::getBodyMetricsViewModel()
+{
+    return &mBodyMetricsViewModel;
+}
+
 void AppController::setupDependencies()
 {
     QObject::connect(
@@ -61,6 +69,9 @@ void AppController::setupDependencies()
         {
             mNutritionViewModel.setDate(pDate);
             mWaterViewModel.setDate(pDate);
+            mBodyMetricsViewModel.setDate(pDate);
         }
     );
 }
+
+

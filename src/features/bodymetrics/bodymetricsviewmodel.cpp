@@ -124,4 +124,3 @@ void BodyMetricsViewModel::wireSignals()
     connect(mService, &BodyMetricsService::compositionChanged, this, &BodyMetricsViewModel::compositionChanged);
     connect(mService, &BodyMetricsService::segmentAnalysisChanged, this, &BodyMetricsViewModel::segmentAnalysisChanged);
 }
-
