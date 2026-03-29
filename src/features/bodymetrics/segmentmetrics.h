@@ -21,7 +21,7 @@ public:
     double getFatPercentage() const noexcept;
     void setFatPercantage(double pFatPercentage) noexcept;
 
-    double pLeanMassKg() const noexcept;
+    double getLeanMassKg() const noexcept;
     void setLeanMassKg(double pLeanMassKg) noexcept;
 
 private:
