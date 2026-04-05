@@ -1,5 +1,7 @@
 #include "bodymetricsviewmodel.h"
 
+#include "QtGlobal"
+
 BodyMetricsViewModel::BodyMetricsViewModel(BodyMetricsService *pService, QObject *pParent)
     : QObject(pParent)
     , mService(pService)
@@ -123,4 +125,22 @@ void BodyMetricsViewModel::wireSignals()
     connect(mService, &BodyMetricsService::dateChanged, this, &BodyMetricsViewModel::dateChanged);
     connect(mService, &BodyMetricsService::compositionChanged, this, &BodyMetricsViewModel::compositionChanged);
     connect(mService, &BodyMetricsService::segmentAnalysisChanged, this, &BodyMetricsViewModel::segmentAnalysisChanged);
+}
+
+double BodyMetricsViewModel::getWeightKg() const
+{
+    return mService->getComposition().getWeightKg();
+}
+
+void BodyMetricsViewModel::increaseWeightKg(double pStep)
+{
+    const double tCurrentWeight = getWeightKg();
+    setWeightKg(tCurrentWeight + pStep);
+}
+
+void BodyMetricsViewModel::decreaseWeightKg(double pStep)
+{
+    const double tCurrentWeight = getWeightKg();
+    const double tNewWeight = qMax(0.0, tCurrentWeight - pStep);
+    setWeightKg(tNewWeight);
 }

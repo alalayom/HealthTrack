@@ -23,15 +23,15 @@ Item {
     property int dinnerGoal: 529
     property int snacksGoal: 106
 
-    property real weightCurrentKg: 78.4
-    property real weightGoalKg: 72.0
+    property real initialWeightKg : 83.1
+    property real weightGoalKg: 78.0
 
     property int stepsToday: 6421
 
-
-    //Real properties for mealData
+    //Real properties
     property var nutritionVM: appController.nutritionViewModel
     property var waterVM: appController.waterViewModel
+    property var bodyMetricsVM: appController.bodyMetricsViewModel
 
     property int caloriesEaten: Math.round(Number(nutritionVM.totalCalories))
     property int caloriesRemaining: caloriesGoal - caloriesEaten + caloriesBurned
@@ -50,12 +50,17 @@ Item {
     property int waterSelectedCupMl: waterVM ? waterVM.selectedCupAmountMl : 250
     property int waterFilledCupCount: waterVM ? waterVM.filledCupCount : 0
     property int waterTargetCupCount: waterVM ? waterVM.targetCupCount : 0
+    property int waterVisibleCupCount: Math.max(waterTargetCupCount, waterFilledCupCount < waterTargetCupCount ? waterTargetCupCount : waterFilledCupCount + 1)
     property bool hasShownWaterGoalOverlay: false
 
-    property int waterVisibleCupCount: Math.max(waterTargetCupCount, waterFilledCupCount < waterTargetCupCount
-        ? waterTargetCupCount : waterFilledCupCount + 1
-    )
+    property bool isWeightLossGoal: true //true for weight loss, false for gain.
+    property bool hasShownWeightGoalOverlay: false
 
+    property string greatJobOverlayText: ""
+    property color greatJobOverlayColor: "#4DB6FF"
+
+
+    //Functions
     function refreshDailyNutritionTotals() {
 
         caloriesEaten = Math.round(Number(nutritionVM.totalCalories))
@@ -91,6 +96,94 @@ Item {
                 : 0
 
         // console.log("NutritionMain refreshed:", breakfastCurrent, lunchCurrent, dinnerCurrent, snacksCurrent)
+    }
+
+    function effectiveWeightKg() {
+        if(!bodyMetricsVM)
+        {
+            return initialWeightKg
+        }
+
+        const tWeight = Number(bodyMetricsVM.weightKg)
+        return tWeight > 0 ? tWeight : initialWeightKg
+    }
+
+    function hasReachedWeightGoal(pWeight) {
+        if(isWeightLossGoal)
+        {
+            return pWeight <= weightGoalKg
+        }
+
+        return pWeight >= weightGoalKg
+    }
+
+    function shouldResetWeightGoalOverlay(pWeight) {
+        if(isWeightLossGoal)
+        {
+            return pWeight > weightGoalKg
+        }
+
+        return pWeight < weightGoalKg
+    }
+
+    function showGreatJobOverlay(pText, pColor) {
+        greatJobOverlayText = pText
+        greatJobOverlayColor = pColor
+        greatJobOverlayAnimation.restart()
+    }
+
+    function increaseDisplayedWeight() {
+        if(!bodyMetricsVM)
+        {
+            return
+        }
+
+        const tCurrent = effectiveWeightKg()
+        const tNext = Number((tCurrent + 0.1).toFixed(1))
+        bodyMetricsVM.setWeightKg(tNext)
+
+        if(hasReachedWeightGoal(tNext) && !hasShownWeightGoalOverlay)
+        {
+            hasShownWeightGoalOverlay = true
+            showGreatJobOverlay("Great job 🎉", "#FFD54F")
+        }
+    }
+
+    function decreaseDisplayedWeight() {
+        if(!bodyMetricsVM)
+        {
+            return
+        }
+
+        const tCurrent = effectiveWeightKg()
+        const tNext = Math.max(0, Number((tCurrent - 0.1).toFixed(1)))
+        bodyMetricsVM.setWeightKg(tNext)
+
+        if(hasReachedWeightGoal(tNext) && !hasShownWeightGoalOverlay)
+        {
+            hasShownWeightGoalOverlay = true
+            showGreatJobOverlay("Great job 🎉", "#FFD54F")
+        }
+
+        if(shouldResetWeightGoalOverlay(tNext))
+        {
+            hasShownWeightGoalOverlay = false
+        }
+    }
+
+    function weightProgressRatio() {
+        const tInitial = Number(initialWeightKg)
+        const tGoal = Number(weightGoalKg)
+        const tCurrent = Number(effectiveWeightKg())
+
+        const tDeltaTotal = tGoal - tInitial
+        if(Math.abs(tDeltaTotal) < 0.0001)
+        {
+            return 1.0
+        }
+
+        const tRaw = (tCurrent - tInitial) / tDeltaTotal
+        return Math.max(0, Math.min(1, tRaw))
     }
 
     Component.onCompleted: {
@@ -527,7 +620,7 @@ Item {
                         if (waterCurrentMl >= waterGoalMl && !hasShownWaterGoalOverlay)
                         {
                             hasShownWaterGoalOverlay = true
-                            greatJobOverlayAnimation.restart()
+                            showGreatJobOverlay("Great job 💧", "#4DB6FF")
                         }
 
                         if (waterCurrentMl < waterGoalMl)
@@ -681,58 +774,55 @@ Item {
             // =========================
             Rectangle {
                 Layout.fillWidth: true
-                radius: 16
+                radius: 18
                 color: card
                 border.color: "#2A2A2A"
                 border.width: 1
-                implicitHeight: weightContent.implicitHeight + 32
-
-                MouseArea {
-                    anchors.fill: parent
-                    propagateComposedEvents: true
-                    onClicked: console.log("TODO: Update weight dialog")
-                }
+                implicitHeight: 210
 
                 ColumnLayout {
-                    id: weightContent
                     anchors.fill: parent
                     anchors.margins: 16
-                    spacing: 20
+                    spacing: 14
 
                     RowLayout {
                         Layout.fillWidth: true
-                        spacing: 12
 
-                        ColumnLayout {
-                            spacing: 2
-
-                            Label {
-                                text: "⏲️ Weight"
-                                color: textPrimary
-                                font.pixelSize: 18
-                                font.bold: true
-                            }
-
-                            Label {
-                                text: "Current: " + weightCurrentKg.toFixed(1) + " kg. Goal is: " + weightGoalKg.toFixed(1) + " kg"
-                                color: textSecondary
-                                font.pixelSize: 14
-                            }
+                        Label {
+                            text: "Weight"
+                            color: textPrimary
+                            font.pixelSize: 20
+                            font.bold: true
                         }
 
                         Item {
                             Layout.fillWidth: true
                         }
 
+                        Label {
+                            text: Math.round(weightProgressRatio() * 100) + "%"
+                            color: textSecondary
+                            font.pixelSize: 13
+                            font.bold: true
+                        }
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                        implicitHeight: 84
+
                         Button {
-                            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                            Layout.preferredHeight: 36
-                            Layout.preferredWidth: 72
+                            anchors.left: parent.left
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 48
+                            height: 48
                             padding: 0
 
                             background: Rectangle {
-                                radius: 18
+                                radius: 24
                                 color: parent.down ? "#505050" : "#3A3A3A"
+                                border.width: 1
+                                border.color: "#4A4A4A"
                             }
 
                             contentItem: Item {
@@ -740,24 +830,91 @@ Item {
 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: "Edit"
+                                    text: "−"
                                     color: textPrimary
-                                    font.pixelSize: 14
+                                    font.pixelSize: 24
                                     font.bold: true
                                 }
                             }
 
-                            onClicked: {
-                                console.log("TODO: Update weight dialog")
+                            onClicked: decreaseDisplayedWeight()
+                        }
+
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: 4
+
+                            Label {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: effectiveWeightKg().toFixed(1) + " kg"
+                                color: textPrimary
+                                font.pixelSize: 36
+                                font.bold: true
                             }
+
+                            Label {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: isWeightLossGoal ? "Fat loss goal" : "Gain goal"
+                                color: textSecondary
+                                font.pixelSize: 13
+                            }
+                        }
+
+                        Button {
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 48
+                            height: 48
+                            padding: 0
+
+                            background: Rectangle {
+                                radius: 24
+                                color: parent.down ? "#505050" : "#3A3A3A"
+                                border.width: 1
+                                border.color: "#4A4A4A"
+                            }
+
+                            contentItem: Item {
+                                anchors.fill: parent
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "+"
+                                    color: textPrimary
+                                    font.pixelSize: 24
+                                    font.bold: true
+                                }
+                            }
+
+                            onClicked: increaseDisplayedWeight()
                         }
                     }
 
                     ProgressBar {
                         Layout.fillWidth: true
                         from: 0
-                        to: Math.max(weightCurrentKg, weightGoalKg)
-                        value: Math.min(weightCurrentKg, Math.max(weightCurrentKg, weightGoalKg))
+                        to: 1
+                        value: weightProgressRatio()
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        Label {
+                            text: "Initial: " + initialWeightKg.toFixed(1) + " kg"
+                            color: textSecondary
+                            font.pixelSize: 13
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                        }
+
+                        Label {
+                            text: "Goal: " + weightGoalKg.toFixed(1) + " kg"
+                            color: textSecondary
+                            font.pixelSize: 13
+                        }
                     }
                 }
             }
@@ -1013,14 +1170,14 @@ Item {
         }
     }
 
-    //Water greatJob label
+    // Generic greatJob label
     Label {
         id: greatJobOverlay
         anchors.centerIn: parent
         z: 999
 
-        text: "Great job 💧"
-        color: "#4DB6FF"
+        text: greatJobOverlayText
+        color: greatJobOverlayColor
         font.pixelSize: 34
         font.bold: true
 
@@ -1033,7 +1190,7 @@ Item {
         }
     }
 
-    //Water greatJob animation
+    //Generic greatJob animation
     SequentialAnimation {
         id: greatJobOverlayAnimation
 

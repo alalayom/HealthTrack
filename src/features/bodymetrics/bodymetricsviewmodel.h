@@ -15,6 +15,8 @@ class BodyMetricsViewModel final : public QObject
     Q_PROPERTY(QVariantMap composition READ getComposition NOTIFY compositionChanged FINAL)
     Q_PROPERTY(QVariantMap segmentAnalysis READ getSegmentAnalysis NOTIFY segmentAnalysisChanged FINAL)
 
+    Q_PROPERTY(double weightKg READ getWeightKg NOTIFY compositionChanged FINAL)
+
 public:
     explicit BodyMetricsViewModel(BodyMetricsService* pService, QObject* pParent = nullptr);
 
@@ -23,6 +25,11 @@ public:
 
     QVariantMap getComposition() const;
     QVariantMap getSegmentAnalysis() const;
+
+    double getWeightKg() const;
+
+    Q_INVOKABLE void increaseWeightKg(double pStep = 0.1);
+    Q_INVOKABLE void decreaseWeightKg(double pStep = 0.1);
 
     Q_INVOKABLE void setWeightKg(double pWeightKg);
     Q_INVOKABLE void setMuscleMassKg(double pMuscleMassKg);
@@ -48,7 +55,6 @@ public:
 signals:
     void dateChanged();
     void compositionChanged();
-
     void segmentAnalysisChanged();
 
 private:
