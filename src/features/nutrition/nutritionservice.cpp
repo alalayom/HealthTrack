@@ -30,8 +30,39 @@ void NutritionService::setDate(const QDate &pDate)
     ensureDefaultMeals();
 
     emit dateChanged();
+    emit notesChanged();
     emit mealsChanged();
     emit totalsChanged();
+}
+
+const QString &NutritionService::getNotes() const noexcept
+{
+    return mDaily.getNotes();
+}
+
+void NutritionService::setNotes(const QString &pNotes)
+{
+    if(mDaily.getNotes() == pNotes)
+    {
+        return;
+    }
+
+    mDaily.setNotes(pNotes);
+
+    emit notesChanged();
+}
+
+void NutritionService::clearNotes()
+{
+    if(mDaily.getNotes().isEmpty())
+    {
+        return;
+    }
+
+    mDaily.clearNotes();
+    saveCurrentDay();
+
+    emit notesChanged();
 }
 
 int NutritionService::mealCount() const noexcept

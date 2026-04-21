@@ -189,6 +189,10 @@ Item {
     Component.onCompleted: {
         refreshMealSummaries()
         refreshDailyNutritionTotals()
+
+        if(nutritionVM) {
+            notesInput.text = nutritionVM.dailyNotes
+        }
     }
 
     Connections {
@@ -213,6 +217,12 @@ Item {
         function onTotalFatChanged() {
             refreshDailyNutritionTotals()
         }
+
+        function onDailyNotesChanged() {
+            if(notesInput.text !== nutritionVM.dailyNotes) {
+                notesInput.text = nutritionVM.dailyNotes
+            }
+        }
     }
 
     // Style
@@ -222,8 +232,6 @@ Item {
     readonly property color textPrimary: "#FFFFFF"
     readonly property color textSecondary: "#A0A0A0"
     readonly property color accent: "#2DA8FF"
-
-    property string dailyNotes: ""
 
     Rectangle {
         anchors.fill: parent
@@ -1111,7 +1119,7 @@ Item {
                             id: notesInput
                             anchors.fill: parent
                             anchors.margins: 12
-                            text: dailyNotes
+                            text: nutritionVM ? nutritionVM.dailyNotes : ""
                             placeholderText: "For example: Felt energetic today, lunch was too heavy, drank less water than usual..."
                             placeholderTextColor: "#7A7A7A"
                             color: textPrimary
@@ -1134,7 +1142,8 @@ Item {
                             Layout.preferredWidth: 88
                             Layout.preferredHeight: 40
                             padding: 0
-                            enabled: notesInput.text.trim() !== dailyNotes.trim()
+
+                            enabled: nutritionVM && notesInput.text.trim() !== nutritionVM.dailyNotes.trim()
 
                             background: Rectangle {
                                 radius: 20
@@ -1154,13 +1163,12 @@ Item {
                             }
 
                             onClicked: {
-                                dailyNotes = notesInput.text
-                                console.log("TODO: Save notes ->", dailyNotes)
+                                nutritionVM.dailyNotes = notesInput.text
+                                nutritionVM.saveCurrentDay()
                             }
                         }
                     }
                 }
-
             }
 
             // Bottom spacing

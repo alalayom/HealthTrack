@@ -47,6 +47,21 @@ void DailyEntry::clearMeals() noexcept
     mMeals.clear();
 }
 
+const QString &DailyEntry::getNotes() const noexcept
+{
+    return mNotes;
+}
+
+void DailyEntry::setNotes(QString pNotes)
+{
+    mNotes = std::move(pNotes);
+}
+
+void DailyEntry::clearNotes() noexcept
+{
+    mNotes.clear();
+}
+
 double DailyEntry::totalCalories() const noexcept
 {
     double tSum = 0.0;

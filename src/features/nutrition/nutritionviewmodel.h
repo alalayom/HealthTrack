@@ -1,11 +1,6 @@
 #ifndef NUTRITIONVIEWMODEL_H
 #define NUTRITIONVIEWMODEL_H
 
-#include <QObject>
-#include <QDate>
-#include <QVariantList>
-#include <QVariantMap>
-
 #include "nutritionservice.h"
 
 class NutritionViewModel final : public QObject
@@ -14,6 +9,7 @@ class NutritionViewModel final : public QObject
 
     Q_PROPERTY(QDate date READ getDate WRITE setDate NOTIFY dateChanged FINAL)
     Q_PROPERTY(QVariantList meals READ getMeals NOTIFY mealsChanged FINAL)
+    Q_PROPERTY(QString dailyNotes READ getDailyNotes WRITE setDailyNotes NOTIFY dailyNotesChanged FINAL)
 
     Q_PROPERTY(double totalCalories READ getTotalCalories NOTIFY totalCaloriesChanged FINAL)
     Q_PROPERTY(double totalProtein READ getTotalProtein NOTIFY totalProteinChanged FINAL)
@@ -28,6 +24,9 @@ public:
     void setDate(const QDate& pDate);
 
     QVariantList getMeals() const;
+
+    QString getDailyNotes() const;
+    void setDailyNotes(const QString& pNotes);
 
     double getTotalCalories() const;
     double getTotalProtein() const;
@@ -45,9 +44,12 @@ public:
     Q_INVOKABLE bool addCatalogFood(const QString& pName, double pCalories, double pProtein, double pCarbs, double pFat);
     Q_INVOKABLE QVariantList searchCatalogFoods(const QString& pSearchText) const;
 
+    Q_INVOKABLE bool saveCurrentDay();
+
 signals:
     void dateChanged();
     void mealsChanged();
+    void dailyNotesChanged();
     void totalCaloriesChanged();
     void totalProteinChanged();
     void totalCarbsChanged();

@@ -25,6 +25,10 @@ public:
     QDate getDate() const noexcept;
     void setDate(const QDate& pDate);
 
+    const QString& getNotes() const noexcept;
+    void setNotes(const QString& pNotes);
+    void clearNotes();
+
     int mealCount() const noexcept;
     MealEntry mealAt(int pMealIndex) const;
     const QList<MealEntry>& getMeals() const noexcept;
@@ -52,6 +56,7 @@ public:
 
 signals:
     void dateChanged();
+    void notesChanged();
     void mealsChanged();
     void totalsChanged();
     void catalogFoodsChanged();

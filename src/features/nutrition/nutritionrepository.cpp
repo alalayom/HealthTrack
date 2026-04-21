@@ -18,7 +18,7 @@ bool NutritionRepository::saveDailyEntry(const DailyEntry& pEntry)
         return false;
     }
 
-    int tDailyId = ensureDailyId(pEntry.getDate());
+    int tDailyId = ensureDailyId(pEntry.getDate(), pEntry.getNotes());
     if(tDailyId <= 0)
     {
         mDatabaseManager->database().rollback();
@@ -63,7 +63,7 @@ DailyEntry NutritionRepository::loadDailyEntry(const QDate& pDate)
 {
     DailyEntry tEntry(pDate);
     QSqlQuery tDailyQuery(mDatabaseManager->database());
-    tDailyQuery.prepare("SELECT id FROM daily_entries WHERE date = ?");
+    tDailyQuery.prepare("SELECT id, notes FROM daily_entries WHERE date = ?");
     tDailyQuery.addBindValue(pDate.toString(Qt::ISODate));
 
     if(!tDailyQuery.exec() || !tDailyQuery.next())
@@ -72,6 +72,8 @@ DailyEntry NutritionRepository::loadDailyEntry(const QDate& pDate)
     }
 
     int tDailyId = tDailyQuery.value(0).toInt();
+    tEntry.setNotes(tDailyQuery.value(1).toString());
+
     QSqlQuery tMealQuery(mDatabaseManager->database());
     tMealQuery.prepare("SELECT id, name FROM meal_entries WHERE daily_id = ?");
     tMealQuery.addBindValue(tDailyId);
@@ -197,7 +199,7 @@ QVariantList NutritionRepository::searchCatalogFoods(const QString &pSearchText)
     return tResults;
 }
 
-int NutritionRepository::ensureDailyId(const QDate& pDate)
+int NutritionRepository::ensureDailyId(const QDate& pDate, const QString& pNotes)
 {
     QSqlQuery tQuery(mDatabaseManager->database());
     tQuery.prepare("SELECT id FROM daily_entries WHERE date = ?");
@@ -205,11 +207,24 @@ int NutritionRepository::ensureDailyId(const QDate& pDate)
 
     if(tQuery.exec() && tQuery.next())
     {
-        return tQuery.value(0).toInt();
+        int tDailyId = tQuery.value(0).toInt();
+
+        QSqlQuery tUpdateQuery(mDatabaseManager->database());
+        tUpdateQuery.prepare("UPDATE daily_entries SET notes = ? WHERE id = ?");
+        tUpdateQuery.addBindValue(pNotes);
+        tUpdateQuery.addBindValue(tDailyId);
+
+        if(!tUpdateQuery.exec())
+        {
+            return -1;
+        }
+
+        return tDailyId;
     }
 
-    tQuery.prepare("INSERT INTO daily_entries(date) VALUES(?)");
+    tQuery.prepare("INSERT INTO daily_entries(date, notes) VALUES(?, ?)");
     tQuery.addBindValue(pDate.toString(Qt::ISODate));
+    tQuery.addBindValue(pNotes);
 
     if(!tQuery.exec())
     {

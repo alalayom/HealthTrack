@@ -21,6 +21,10 @@ public:
     void removeMeal(int pIndex);
     void clearMeals() noexcept;
 
+    const QString& getNotes() const noexcept;
+    void setNotes(QString pNotes);
+    void clearNotes() noexcept;
+
     double totalCalories() const noexcept;
     double totalProtein() const noexcept;
     double totalCarbs() const noexcept;
@@ -32,6 +36,7 @@ public:
 private:
     QDate mDate;
     QList<MealEntry> mMeals;
+    QString mNotes;
 };
 
 #endif // DAILYENTRY_H

@@ -22,7 +22,7 @@ public:
     QVariantList searchCatalogFoods(const QString& pSearchText) const;
 
 private:
-    int ensureDailyId(const QDate& pDate);
+    int ensureDailyId(const QDate& pDate, const QString& pNotes);
     int insertMeal(int pDailyId, const MealEntry& pMeal);
     bool insertFood(int pMealId, const FoodEntry& pFood);
 

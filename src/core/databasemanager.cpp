@@ -202,7 +202,8 @@ bool DatabaseManager::createTables()
     if(!tQuery.exec(R"(
         CREATE TABLE IF NOT EXISTS daily_entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            date TEXT NOT NULL UNIQUE
+            date TEXT NOT NULL UNIQUE,
+            notes TEXT
         )
     )"))
     {
