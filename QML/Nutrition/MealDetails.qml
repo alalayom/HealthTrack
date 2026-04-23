@@ -48,9 +48,23 @@ Page {
         searchResults = nutritionVM.searchCatalogFoods(searchField.text)
     }
 
-    function addCatalogFoodToMeal(foodItem) {
-        console.log("addCatalogFoodToMeal called -> mealIndex:", mealIndex,
+    function openFoodPortionPopup(foodItem) {
+        console.log("openFoodPortionPopup called -> mealIndex:", mealIndex,
                     "name:", foodItem ? foodItem.name : "null")
+
+        if (!foodItem || mealIndex < 0)
+        {
+            console.log("Popup open aborted: invalid foodItem or mealIndex")
+            return
+        }
+
+        portionPopup.openForFood(foodItem)
+    }
+
+    function addCatalogFoodToMeal(foodItem, grams) {
+        console.log("addCatalogFoodToMeal called -> mealIndex:", mealIndex,
+                    "name:", foodItem ? foodItem.name : "null",
+                    "grams:", grams)
 
         if (!foodItem || mealIndex < 0)
         {
@@ -64,14 +78,23 @@ Page {
             Number(foodItem.calories),
             Number(foodItem.protein),
             Number(foodItem.carbs),
-            Number(foodItem.fat)
+            Number(foodItem.fat),
+            Number(grams),
+            Number(foodItem.id)
         )
-
-        refreshMealData()
     }
 
     background: Rectangle {
         color: "#121212"
+    }
+
+    FoodPortionPopup {
+        id: portionPopup
+        nutritionVM: root.nutritionVM
+
+        onAddRequested: function(grams) {
+            root.addCatalogFoodToMeal(foodItem, grams)
+        }
     }
 
     Component.onCompleted: {
@@ -206,7 +229,7 @@ Page {
                 spacing: 8
 
                 Label {
-                    text: "Search Results"
+                    text: "Search Results (100 g)"
                     color: "#FFFFFF"
                     font.pixelSize: 18
                     font.bold: true
@@ -243,7 +266,7 @@ Page {
                                 }
 
                                 Label {
-                                    text: Number(modelData.calories).toFixed(0) + " Calories, "
+                                    text: "100 g: " + Number(modelData.calories).toFixed(0) + " Calories, "
                                         + Number(modelData.protein).toFixed(1) + " g protein, "
                                         + Number(modelData.carbs).toFixed(1) + " g carbs, "
                                         + Number(modelData.fat).toFixed(1) + " g fat"
@@ -279,7 +302,7 @@ Page {
 
                                 onClicked: {
                                     console.log("Plus clicked ->", modelData.name, "mealIndex:", mealIndex)
-                                    root.addCatalogFoodToMeal(modelData)
+                                    root.openFoodPortionPopup(modelData)
                                 }
                             }
                         }
@@ -340,7 +363,8 @@ Page {
                                 }
 
                                 Label {
-                                    text: Number(modelData.calories).toFixed(0) + " Calories, "
+                                    text: Number(modelData.grams).toFixed(0) + " g, "
+                                        + Number(modelData.calories).toFixed(0) + " Calories, "
                                         + Number(modelData.protein).toFixed(1) + " g protein, "
                                         + Number(modelData.carbs).toFixed(1) + " g carbs,  "
                                         + Number(modelData.fat).toFixed(1) + " g fat"

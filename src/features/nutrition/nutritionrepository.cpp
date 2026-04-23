@@ -90,7 +90,7 @@ DailyEntry NutritionRepository::loadDailyEntry(const QDate& pDate)
         MealEntry tMeal(tMealName);
 
         QSqlQuery tFoodQuery(mDatabaseManager->database());
-        tFoodQuery.prepare("SELECT name, calories, protein, carbs, fat FROM food_entries WHERE meal_id = ?");
+        tFoodQuery.prepare("SELECT name, calories, protein, carbs, fat, grams, catalog_food_id FROM food_entries WHERE meal_id = ?");
         tFoodQuery.addBindValue(tMealId);
 
         if(tFoodQuery.exec())
@@ -102,7 +102,9 @@ DailyEntry NutritionRepository::loadDailyEntry(const QDate& pDate)
                     tFoodQuery.value(1).toDouble(),
                     tFoodQuery.value(2).toDouble(),
                     tFoodQuery.value(3).toDouble(),
-                    tFoodQuery.value(4).toDouble()
+                    tFoodQuery.value(4).toDouble(),
+                    tFoodQuery.value(5).toDouble(),
+                    tFoodQuery.value(6).isNull() ? -1 : tFoodQuery.value(6).toInt()
                 ));
             }
         }
@@ -253,16 +255,18 @@ bool NutritionRepository::insertFood(int pMealId, const FoodEntry& pFood)
 {
     QSqlQuery tQuery(mDatabaseManager->database());
     tQuery.prepare(R"(
-        INSERT INTO food_entries(meal_id, name, calories, protein, carbs, fat)
-        VALUES(?, ?, ?, ?, ?, ?)
+        INSERT INTO food_entries(meal_id, catalog_food_id, name, calories, protein, carbs, fat, grams)
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?)
     )");
 
     tQuery.addBindValue(pMealId);
+    tQuery.addBindValue(pFood.hasCatalogFoodId() ? QVariant(pFood.getCatalogFoodId()) : QVariant());
     tQuery.addBindValue(pFood.getName());
     tQuery.addBindValue(pFood.getCalories());
     tQuery.addBindValue(pFood.getProtein());
     tQuery.addBindValue(pFood.getCarbs());
     tQuery.addBindValue(pFood.getFat());
+    tQuery.addBindValue(pFood.getGrams());
 
     return tQuery.exec();
 }

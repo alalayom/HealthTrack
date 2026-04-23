@@ -32,6 +32,7 @@ qt_add_qml_module(appHealthTrack
         QML/Nutrition/NutritionMain.qml
         QML/Nutrition/MealDetails.qml
         QML/Nutrition/AddFood.qml
+        QML/Nutrition/FoodPortionPopup.qml
 
         QML/Sport/SportMain.qml
 
@@ -53,6 +54,7 @@ qt_add_qml_module(appHealthTrack
         SOURCES src/core/unitconverter.h src/core/unitconverter.cpp
 
         SOURCES src/features/nutrition/foodentry.h src/features/nutrition/foodentry.cpp
+        SOURCES src/features/nutrition/foodportioncalculator.h src/features/nutrition/foodportioncalculator.cpp
         SOURCES src/features/nutrition/mealentry.h src/features/nutrition/mealentry.cpp
         SOURCES src/features/nutrition/dailyentry.h src/features/nutrition/dailyentry.cpp
         SOURCES src/features/nutrition/nutritionrepository.h src/features/nutrition/nutritionrepository.cpp

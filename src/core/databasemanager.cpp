@@ -197,6 +197,34 @@ bool DatabaseManager::configureDatabase()
 bool DatabaseManager::createTables()
 {
     QSqlQuery tQuery(database());
+    const auto tEnsureColumn = [](const QString& pTableName,
+                                  const QString& pColumnName,
+                                  const QString& pColumnDefinition) -> bool
+    {
+        QSqlQuery tInfoQuery(DatabaseManager::database());
+        if(!tInfoQuery.exec(QString("PRAGMA table_info(%1)").arg(pTableName)))
+        {
+            qCritical() << "Failed to read table info for" << pTableName << ":" << tInfoQuery.lastError().text();
+            return false;
+        }
+
+        while(tInfoQuery.next())
+        {
+            if(tInfoQuery.value(1).toString().compare(pColumnName, Qt::CaseInsensitive) == 0)
+            {
+                return true;
+            }
+        }
+
+        QSqlQuery tAlterQuery(DatabaseManager::database());
+        if(!tAlterQuery.exec(QString("ALTER TABLE %1 ADD COLUMN %2").arg(pTableName, pColumnDefinition)))
+        {
+            qCritical() << "Failed to add column" << pColumnName << "to" << pTableName << ":" << tAlterQuery.lastError().text();
+            return false;
+        }
+
+        return true;
+    };
 
     //Daily_entries table
     if(!tQuery.exec(R"(
@@ -252,12 +280,18 @@ bool DatabaseManager::createTables()
             protein REAL NOT NULL,
             carbs REAL NOT NULL,
             fat REAL NOT NULL,
+            grams REAL NOT NULL DEFAULT 100,
             FOREIGN KEY(meal_id) REFERENCES meal_entries(id) ON DELETE CASCADE,
             FOREIGN KEY(catalog_food_id) REFERENCES foods(id) ON DELETE SET NULL
         )
     )"))
     {
         qCritical() << tQuery.lastError().text();
+        return false;
+    }
+
+    if(!tEnsureColumn("food_entries", "grams", "grams REAL NOT NULL DEFAULT 100"))
+    {
         return false;
     }
 

@@ -129,20 +129,39 @@ void NutritionService::clearMeals() noexcept
     emit totalsChanged();
 }
 
-void NutritionService::addFood(int pMealIndex, const QString &pName, double pCalories, double pProtein, double pCarbs, double pFat)
+void NutritionService::addFood(int pMealIndex,
+                               const QString &pName,
+                               double pCalories,
+                               double pProtein,
+                               double pCarbs,
+                               double pFat,
+                               double pGrams,
+                               int pCatalogFoodId)
+{
+    addFood(pMealIndex, FoodEntry(pName, pCalories, pProtein, pCarbs, pFat, pGrams, pCatalogFoodId));
+}
+
+void NutritionService::addFood(int pMealIndex, FoodEntry pFood)
 {
     if(pMealIndex < 0 || pMealIndex >= mDaily.getMeals().size())
     {
         return;
     }
 
-    const QString tTrimmedName = pName.trimmed();
+    const QString tTrimmedName = pFood.getName().trimmed();
     if(tTrimmedName.isEmpty())
     {
         return;
     }
 
-    mDaily.mealRef(pMealIndex).addFood(FoodEntry(tTrimmedName, pCalories, pProtein, pCarbs, pFat));
+    if(pFood.getGrams() <= 0.0)
+    {
+        return;
+    }
+
+    pFood.setName(tTrimmedName);
+
+    mDaily.mealRef(pMealIndex).addFood(std::move(pFood));
     saveCurrentDay();
 
     emit mealsChanged();
@@ -272,6 +291,10 @@ QVariantMap NutritionService::foodToVariant(const FoodEntry &pFood)
 {
     QVariantMap tMap;
     tMap["name"] = pFood.getName();
+    tMap["grams"] = pFood.getGrams();
+    tMap["catalogFoodId"] = pFood.hasCatalogFoodId()
+                                ? QVariant(pFood.getCatalogFoodId())
+                                : QVariant();
     tMap["calories"] = pFood.getCalories();
     tMap["protein"] = pFood.getProtein();
     tMap["carbs"] = pFood.getCarbs();

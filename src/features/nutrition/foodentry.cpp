@@ -5,21 +5,33 @@ FoodEntry::FoodEntry()
     , mProtein(0.0)
     , mCarbs(0.0)
     , mFat(0.0)
+    , mGrams(0.0)
+    , mCatalogFoodId(-1)
 {
 
 }
 
-FoodEntry::FoodEntry(QString pName, double pCalories, double pProtein, double pCarbs, double pFat)
+FoodEntry::FoodEntry(QString pName,
+                     double pCalories,
+                     double pProtein,
+                     double pCarbs,
+                     double pFat,
+                     double pGrams,
+                     int pCatalogFoodId)
     : mName(std::move(pName))
     , mCalories(0.0)
     , mProtein(0.0)
     , mCarbs(0.0)
     , mFat(0.0)
+    , mGrams(0.0)
+    , mCatalogFoodId(-1)
 {
     setCalories(pCalories);
     setProtein(pProtein);
     setCarbs(pCarbs);
     setFat(pFat);
+    setGrams(pGrams);
+    setCatalogFoodId(pCatalogFoodId);
 }
 
 FoodEntry::~FoodEntry() = default;
@@ -49,6 +61,21 @@ double FoodEntry::getFat() const noexcept
     return mFat;
 }
 
+double FoodEntry::getGrams() const noexcept
+{
+    return mGrams;
+}
+
+int FoodEntry::getCatalogFoodId() const noexcept
+{
+    return mCatalogFoodId;
+}
+
+bool FoodEntry::hasCatalogFoodId() const noexcept
+{
+    return mCatalogFoodId > 0;
+}
+
 void FoodEntry::setName(QString pName)
 {
     mName = std::move(pName);
@@ -72,6 +99,16 @@ void FoodEntry::setCarbs(double pCarbs)
 void FoodEntry::setFat(double pFat)
 {
     mFat = qMax(0.0, pFat);
+}
+
+void FoodEntry::setGrams(double pGrams)
+{
+    mGrams = qMax(0.0, pGrams);
+}
+
+void FoodEntry::setCatalogFoodId(int pCatalogFoodId)
+{
+    mCatalogFoodId = pCatalogFoodId > 0 ? pCatalogFoodId : -1;
 }
 
 

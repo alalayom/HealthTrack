@@ -37,12 +37,25 @@ public:
     Q_INVOKABLE void removeMeal(int pMealIndex);
     Q_INVOKABLE void clearMeals();
 
-    Q_INVOKABLE void addFoodToMeal(int pMealIndex, const QString& pName, double pCalories, double pProtein, double pCarbs, double pFat);
+    Q_INVOKABLE void addFoodToMeal(int pMealIndex,
+                                   const QString& pName,
+                                   double pCaloriesPer100g,
+                                   double pProteinPer100g,
+                                   double pCarbsPer100g,
+                                   double pFatPer100g,
+                                   double pGrams = 100.0,
+                                   int pCatalogFoodId = -1);
     Q_INVOKABLE void removeFood(int pMealIndex, int pFoodIndex);
     Q_INVOKABLE void clearFoods(int pMealIndex);
 
     Q_INVOKABLE bool addCatalogFood(const QString& pName, double pCalories, double pProtein, double pCarbs, double pFat);
     Q_INVOKABLE QVariantList searchCatalogFoods(const QString& pSearchText) const;
+    Q_INVOKABLE QVariantMap calculateFoodPortion(const QString& pName,
+                                                 double pCaloriesPer100g,
+                                                 double pProteinPer100g,
+                                                 double pCarbsPer100g,
+                                                 double pFatPer100g,
+                                                 double pGrams) const;
 
     Q_INVOKABLE bool saveCurrentDay();
 

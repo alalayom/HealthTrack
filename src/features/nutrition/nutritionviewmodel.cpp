@@ -1,5 +1,7 @@
 #include "nutritionviewmodel.h"
 
+#include "foodportioncalculator.h"
+
 NutritionViewModel::NutritionViewModel(NutritionService* pService, QObject *pParent)
     : QObject(pParent)
     , mService(pService)
@@ -68,9 +70,24 @@ void NutritionViewModel::clearMeals()
     mService->clearMeals();
 }
 
-void NutritionViewModel::addFoodToMeal(int pMealIndex, const QString &pName, double pCalories, double pProtein, double pCarbs, double pFat)
+void NutritionViewModel::addFoodToMeal(int pMealIndex,
+                                       const QString &pName,
+                                       double pCaloriesPer100g,
+                                       double pProteinPer100g,
+                                       double pCarbsPer100g,
+                                       double pFatPer100g,
+                                       double pGrams,
+                                       int pCatalogFoodId)
 {
-    mService->addFood(pMealIndex, pName, pCalories, pProtein, pCarbs, pFat);
+    FoodEntry tFood = FoodPortionCalculator::createPortionedFood(pName,
+                                                                 pCaloriesPer100g,
+                                                                 pProteinPer100g,
+                                                                 pCarbsPer100g,
+                                                                 pFatPer100g,
+                                                                 pGrams);
+    tFood.setCatalogFoodId(pCatalogFoodId);
+
+    mService->addFood(pMealIndex, tFood);
 }
 
 void NutritionViewModel::removeFood(int pMealIndex, int pFoodIndex)
@@ -91,6 +108,21 @@ bool NutritionViewModel::addCatalogFood(const QString &pName, double pCalories, 
 QVariantList NutritionViewModel::searchCatalogFoods(const QString &pSearchText) const
 {
     return mService->searchCatalogFoods(pSearchText);
+}
+
+QVariantMap NutritionViewModel::calculateFoodPortion(const QString &pName,
+                                                     double pCaloriesPer100g,
+                                                     double pProteinPer100g,
+                                                     double pCarbsPer100g,
+                                                     double pFatPer100g,
+                                                     double pGrams) const
+{
+    return FoodPortionCalculator::createPreview(pName,
+                                                pCaloriesPer100g,
+                                                pProteinPer100g,
+                                                pCarbsPer100g,
+                                                pFatPer100g,
+                                                pGrams);
 }
 
 bool NutritionViewModel::saveCurrentDay()

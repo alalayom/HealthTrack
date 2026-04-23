@@ -13,7 +13,9 @@ public:
               double pCalories,
               double pProtein,
               double pCarbs,
-              double pFat);
+              double pFat,
+              double pGrams = 100.0,
+              int pCatalogFoodId = -1);
 
     ~FoodEntry();
 
@@ -22,12 +24,17 @@ public:
     double getProtein() const noexcept;
     double getCarbs() const noexcept;
     double getFat() const noexcept;
+    double getGrams() const noexcept;
+    int getCatalogFoodId() const noexcept;
+    bool hasCatalogFoodId() const noexcept;
 
     void setName(QString pName);
     void setCalories(double pCalories);
     void setProtein(double pProtein);
     void setCarbs(double pCarbs);
     void setFat(double pFat);
+    void setGrams(double pGrams);
+    void setCatalogFoodId(int pCatalogFoodId);
 
 private:
 
@@ -36,6 +43,8 @@ private:
     double mProtein;
     double mCarbs;
     double mFat;
+    double mGrams;
+    int mCatalogFoodId;
 };
 
 #endif // FOODENTRY_H

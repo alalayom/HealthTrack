@@ -98,7 +98,7 @@ Page {
                 TextField {
                     id: caloriesField
                     Layout.fillWidth: true
-                    placeholderText: "Calories"
+                    placeholderText: "Calories (per 100 g)"
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     color: "#FFFFFF"
 
@@ -112,7 +112,7 @@ Page {
                 TextField {
                     id: proteinField
                     Layout.fillWidth: true
-                    placeholderText: "Protein (g)"
+                    placeholderText: "Protein (g per 100 g)"
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     color: "#FFFFFF"
 
@@ -126,7 +126,7 @@ Page {
                 TextField {
                     id: carbsField
                     Layout.fillWidth: true
-                    placeholderText: "Carbs (g)"
+                    placeholderText: "Carbs (g per 100 g)"
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     color: "#FFFFFF"
 
@@ -140,7 +140,7 @@ Page {
                 TextField {
                     id: fatField
                     Layout.fillWidth: true
-                    placeholderText: "Fat (g)"
+                    placeholderText: "Fat (g per 100 g)"
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     color: "#FFFFFF"
 
@@ -149,6 +149,13 @@ Page {
                         color: "#222222"
                         border.color: "#333333"
                     }
+                }
+
+                Label {
+                    Layout.fillWidth: true
+                    color: "#A0A0A0"
+                    wrapMode: Text.WordWrap
+                    text: "These values are stored as the food's 100 g reference."
                 }
 
                 Label {

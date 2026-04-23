@@ -36,7 +36,15 @@ public:
     void removeMeal(int pMealIndex);
     void clearMeals() noexcept;
 
-    void addFood(int pMealIndex, const QString& pName, double pCalories, double pProtein, double pCarbs, double pFat);
+    void addFood(int pMealIndex,
+                 const QString& pName,
+                 double pCalories,
+                 double pProtein,
+                 double pCarbs,
+                 double pFat,
+                 double pGrams = 100.0,
+                 int pCatalogFoodId = -1);
+    void addFood(int pMealIndex, FoodEntry pFood);
     void removeFood(int pMealIndex, int pFoodIndex);
     void clearFoods(int pMealIndex);
 
