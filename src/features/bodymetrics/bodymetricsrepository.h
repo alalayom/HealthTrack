@@ -14,6 +14,7 @@ public:
 
     bool saveMeasurementEntry(const BodyMeasurementEntry& pEntry);
     BodyMeasurementEntry loadMeasurementEntry(const QDate& pDate);
+    BodyMeasurementEntry loadLatestMeasurementEntryOnOrBefore(const QDate& pDate);
     bool deleteMeasurementEntry(const QDate& pDate);
 
 private:

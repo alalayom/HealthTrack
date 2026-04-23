@@ -25,6 +25,16 @@ void BodyMetricsService::setDate(const QDate &pDate)
 
     mMeasurement = mRepository.loadMeasurementEntry(pDate);
 
+    if(mMeasurement.getId() <= 0)
+    {
+        BodyMeasurementEntry tFallbackMeasurement = mRepository.loadLatestMeasurementEntryOnOrBefore(pDate);
+        if(tFallbackMeasurement.getId() > 0)
+        {
+            tFallbackMeasurement.setId(-1);
+            mMeasurement = tFallbackMeasurement;
+        }
+    }
+
     if(mMeasurement.getMeasurementDate() != pDate)
     {
         mMeasurement.setMeasurementDate(pDate);

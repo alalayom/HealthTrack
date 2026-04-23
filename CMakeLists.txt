@@ -33,6 +33,7 @@ qt_add_qml_module(appHealthTrack
         QML/Nutrition/MealDetails.qml
         QML/Nutrition/AddFood.qml
         QML/Nutrition/FoodPortionPopup.qml
+        QML/Nutrition/NutritionDatePickerPopup.qml
 
         QML/Sport/SportMain.qml
 

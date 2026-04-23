@@ -194,6 +194,29 @@ BodyMeasurementEntry BodyMetricsRepository::loadMeasurementEntry(const QDate &pD
     return tEntry;
 }
 
+BodyMeasurementEntry BodyMetricsRepository::loadLatestMeasurementEntryOnOrBefore(const QDate &pDate)
+{
+    QSqlQuery tQuery(mDatabaseManager->database());
+    tQuery.prepare(R"(
+        SELECT measurement_date
+        FROM body_measurements
+        WHERE measurement_date <= ?
+        ORDER BY measurement_date DESC
+        LIMIT 1
+    )");
+    tQuery.addBindValue(pDate.toString(Qt::ISODate));
+
+    if(!tQuery.exec() || !tQuery.next())
+    {
+        BodyMeasurementEntry tEmptyEntry;
+        tEmptyEntry.setMeasurementDate(pDate);
+        return tEmptyEntry;
+    }
+
+    const QDate tFoundDate = QDate::fromString(tQuery.value(0).toString(), Qt::ISODate);
+    return loadMeasurementEntry(tFoundDate);
+}
+
 bool BodyMetricsRepository::deleteMeasurementEntry(const QDate &pDate)
 {
     QSqlQuery tQuery(mDatabaseManager->database());

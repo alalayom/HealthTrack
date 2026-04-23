@@ -9,8 +9,6 @@ Item {
     height: parent ? parent.height : 0
 
     // Added dummy data for testing qml page design. Later data will be provided from ViewModel
-    property string selectedDateText: "Today"
-
     property int caloriesBurned: 244
     property int caloriesGoal: 2117
 
@@ -29,6 +27,14 @@ Item {
     property int stepsToday: 6421
 
     //Real properties
+    readonly property var dateLocale: Qt.locale("en_US")
+    readonly property var minimumSelectableDate: new Date(2026, 0, 1)
+    readonly property var maximumSelectableDate: new Date(2027, 0, 31)
+    readonly property var appState: appController.appState
+    property date currentNutritionDate: appState ? appState.selectedDate : new Date()
+    property string selectedDateText: formatHeaderDate(currentNutritionDate)
+    property string selectedDateSubtitle: formatHeaderSubtitle(currentNutritionDate)
+
     property var nutritionVM: appController.nutritionViewModel
     property var waterVM: appController.waterViewModel
     property var bodyMetricsVM: appController.bodyMetricsViewModel
@@ -52,6 +58,7 @@ Item {
     property int waterTargetCupCount: waterVM ? waterVM.targetCupCount : 0
     property int waterVisibleCupCount: Math.max(waterTargetCupCount, waterFilledCupCount < waterTargetCupCount ? waterTargetCupCount : waterFilledCupCount + 1)
     property bool hasShownWaterGoalOverlay: false
+    property bool suppressNextWaterGoalAnimation: false
 
     property bool isWeightLossGoal: true //true for weight loss, false for gain.
     property bool hasShownWeightGoalOverlay: false
@@ -61,6 +68,78 @@ Item {
 
 
     //Functions
+    function normalizedDate(pDate) {
+        const tDate = new Date(pDate)
+        return new Date(tDate.getFullYear(), tDate.getMonth(), tDate.getDate())
+    }
+
+    function sameDay(pLeft, pRight) {
+        if (!pLeft || !pRight)
+        {
+            return false
+        }
+
+        return pLeft.getFullYear() === pRight.getFullYear()
+                && pLeft.getMonth() === pRight.getMonth()
+                && pLeft.getDate() === pRight.getDate()
+    }
+
+    function clampSelectableDate(pDate) {
+        const tDate = normalizedDate(pDate)
+        const tMin = normalizedDate(minimumSelectableDate)
+        const tMax = normalizedDate(maximumSelectableDate)
+
+        if (tDate.getTime() < tMin.getTime())
+        {
+            return new Date(tMin.getTime())
+        }
+
+        if (tDate.getTime() > tMax.getTime())
+        {
+            return new Date(tMax.getTime())
+        }
+
+        return tDate
+    }
+
+    function setSelectedDate(pDate) {
+        if (!appState)
+        {
+            return
+        }
+
+        const tDate = clampSelectableDate(pDate)
+        const tCurrent = normalizedDate(currentNutritionDate)
+
+        if (sameDay(tDate, tCurrent))
+        {
+            return
+        }
+
+        appState.selectedDate = tDate
+    }
+
+    function shiftSelectedDate(pDays) {
+        const tCurrent = normalizedDate(currentNutritionDate)
+        setSelectedDate(new Date(tCurrent.getFullYear(), tCurrent.getMonth(), tCurrent.getDate() + pDays))
+    }
+
+    function formatHeaderDate(pDate) {
+        return pDate ? dateLocale.toString(pDate, "d MMMM yyyy") : ""
+    }
+
+    function formatHeaderSubtitle(pDate) {
+        return pDate ? dateLocale.toString(pDate, "dddd") + " - Your daily summary" : "Your daily summary"
+    }
+
+    function syncWaterGoalOverlayState() {
+        hasShownWaterGoalOverlay = waterGoalMl > 0 && waterCurrentMl >= waterGoalMl
+    }
+
+    function syncWeightGoalOverlayState() {
+        hasShownWeightGoalOverlay = hasReachedWeightGoal(effectiveWeightKg())
+    }
+
     function refreshDailyNutritionTotals() {
 
         caloriesEaten = Math.round(Number(nutritionVM.totalCalories))
@@ -189,6 +268,8 @@ Item {
     Component.onCompleted: {
         refreshMealSummaries()
         refreshDailyNutritionTotals()
+        syncWaterGoalOverlayState()
+        syncWeightGoalOverlayState()
 
         if(nutritionVM) {
             notesInput.text = nutritionVM.dailyNotes
@@ -238,6 +319,64 @@ Item {
         color: bg
     }
 
+    NutritionDatePickerPopup {
+        id: datePickerPopup
+        minimumDate: nutritionRoot.minimumSelectableDate
+        maximumDate: nutritionRoot.maximumSelectableDate
+
+        onDateSelected: function(selectedDate) {
+            nutritionRoot.setSelectedDate(selectedDate)
+        }
+    }
+
+    Connections {
+        target: waterVM
+
+        function onDateChanged() {
+            suppressNextWaterGoalAnimation = true
+        }
+    }
+
+    Connections {
+        target: bodyMetricsVM
+
+        function onDateChanged() {
+            syncWeightGoalOverlayState()
+        }
+    }
+
+    DragHandler {
+        id: daySwipeHandler
+        target: null
+        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchScreen | PointerDevice.TouchPad
+        xAxis.enabled: true
+        yAxis.enabled: false
+
+        onActiveChanged: {
+            if (active || datePickerPopup.visible)
+            {
+                return
+            }
+
+            const tDeltaX = centroid.position.x - centroid.pressPosition.x
+            const tDeltaY = centroid.position.y - centroid.pressPosition.y
+
+            if (Math.abs(tDeltaX) < 90 || Math.abs(tDeltaX) <= Math.abs(tDeltaY))
+            {
+                return
+            }
+
+            if (tDeltaX < 0)
+            {
+                nutritionRoot.shiftSelectedDate(1)
+            }
+            else
+            {
+                nutritionRoot.shiftSelectedDate(-1)
+            }
+        }
+    }
+
     ScrollView {
         id: scroll
         anchors.fill: parent
@@ -255,28 +394,35 @@ Item {
                 Layout.fillWidth: true
                 spacing: 12
 
-                ColumnLayout {
-                    spacing: 4
-
-                    Label {
-                        text: selectedDateText
-                        color: textPrimary
-                        font.pixelSize: 36
-                        font.bold: true
-                    }
-
-                    Label {
-                        text: "Your daily summary"
-                        color: textSecondary
-                        font.pixelSize: 14
-                    }
-                }
-
                 Item {
                     Layout.fillWidth: true
+                    implicitHeight: dateHeaderContent.implicitHeight
+
+                    TapHandler {
+                        onTapped: datePickerPopup.openForDate(nutritionRoot.currentNutritionDate)
+                    }
+
+                    ColumnLayout {
+                        id: dateHeaderContent
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 4
+
+                        Label {
+                            text: selectedDateText
+                            color: textPrimary
+                            font.pixelSize: 36
+                            font.bold: true
+                        }
+
+                        Label {
+                            text: selectedDateSubtitle
+                            color: textSecondary
+                            font.pixelSize: 14
+                        }
+                    }
                 }
 
-                //TODO: Add date change menu to here
                 Button {
                     Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                     Layout.preferredWidth: 60
@@ -298,9 +444,7 @@ Item {
                         }
                     }
 
-                    onClicked: {
-                        console.log("TODO: date picker")
-                    }
+                    onClicked: datePickerPopup.openForDate(nutritionRoot.currentNutritionDate)
                 }
             }
 
@@ -622,6 +766,13 @@ Item {
                     function onCurrentAmountMlChanged() {
                         if (!waterVM)
                         {
+                            return
+                        }
+
+                        if (suppressNextWaterGoalAnimation)
+                        {
+                            suppressNextWaterGoalAnimation = false
+                            syncWaterGoalOverlayState()
                             return
                         }
 
