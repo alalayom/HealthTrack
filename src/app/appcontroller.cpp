@@ -12,6 +12,8 @@ AppController::AppController(QObject *pParent)
     , mWaterViewModel(&mWaterService, this)
     , mBodyMetricsService(&mDatabaseManager, this)
     , mBodyMetricsViewModel(&mBodyMetricsService, this)
+    , mSportService(&mDatabaseManager, this)
+    , mSportViewModel(&mSportService, this)
 {
     if(!mDatabaseManager.initialize(true))
     {
@@ -19,6 +21,7 @@ AppController::AppController(QObject *pParent)
         return;
     }
 
+    mSportService.ensureDefaultExercises();
     mBodyMetricsService.setDate(QDate::currentDate());
 
     qDebug() << "AppController initialized successfully.";
@@ -33,6 +36,7 @@ bool AppController::initialize(bool pDevResetDatabase)
     }
 
     setupDependencies();
+    mSportService.ensureDefaultExercises();
 
     mNutritionViewModel.setDate(mAppState.getSelectedDate());
     mWaterViewModel.setDate(mAppState.getSelectedDate());
@@ -67,6 +71,11 @@ BodyMetricsViewModel* AppController::getBodyMetricsViewModel()
     return &mBodyMetricsViewModel;
 }
 
+SportViewModel* AppController::getSportViewModel()
+{
+    return &mSportViewModel;
+}
+
 void AppController::setupDependencies()
 {
     QObject::connect(
@@ -81,5 +90,3 @@ void AppController::setupDependencies()
         }
     );
 }
-
-

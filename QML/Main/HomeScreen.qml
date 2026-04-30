@@ -25,6 +25,10 @@ Item {
         {
             return "../Nutrition/AddFood.qml"
         }
+        if (tPage === NavigationManager.Sport)
+        {
+            return "../Sport/SportMain.qml"
+        }
 
         return ""
     }
@@ -159,9 +163,12 @@ Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     radius: 8
-                    color: "#2A2A2A"
+                    color: nav.currentPage === NavigationManager.Sport ? "#3A3A3A" : "#2A2A2A"
 
-                    //TODO: Add sport section to it.
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: nav.navigateTo(NavigationManager.Sport)
+                    }
 
                     Label {
                         anchors.centerIn: parent

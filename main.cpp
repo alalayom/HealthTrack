@@ -534,5 +534,8 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    //TODO: Add pre-defined meals to nutrition segment.
+    //TODO: Add barcode reader for nutrition segment.
+
     return app.exec();
 }

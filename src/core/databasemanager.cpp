@@ -132,6 +132,11 @@ bool DatabaseManager::deleteTablesForTest()
         return false;
     }
 
+    if(!tQuery.exec("DROP TABLE IF EXISTS exercises;"))
+    {
+        return false;
+    }
+
     if(!tQuery.exec("PRAGMA foreign_keys = ON;"))
     {
         return false;
@@ -197,9 +202,7 @@ bool DatabaseManager::configureDatabase()
 bool DatabaseManager::createTables()
 {
     QSqlQuery tQuery(database());
-    const auto tEnsureColumn = [](const QString& pTableName,
-                                  const QString& pColumnName,
-                                  const QString& pColumnDefinition) -> bool
+    const auto tEnsureColumn = [](const QString& pTableName, const QString& pColumnName, const QString& pColumnDefinition) -> bool
     {
         QSqlQuery tInfoQuery(DatabaseManager::database());
         if(!tInfoQuery.exec(QString("PRAGMA table_info(%1)").arg(pTableName)))
@@ -359,6 +362,19 @@ bool DatabaseManager::createTables()
         return false;
     }
 
+    //Exercises catalog table
+    if(!tQuery.exec(R"(
+        CREATE TABLE IF NOT EXISTS exercises (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE,
+            muscle_group TEXT NOT NULL
+        )
+    )"))
+    {
+        qCritical() << "Failed to create exercises:" << tQuery.lastError().text();
+        return false;
+    }
+
     //Indexes for foreign keys
     if(!tQuery.exec(R"(
         CREATE INDEX IF NOT EXISTS idx_meal_daily_id
@@ -420,6 +436,24 @@ bool DatabaseManager::createTables()
     )"))
     {
         qCritical() << "Failed to create idx_body_segment_name:" << tQuery.lastError().text();
+        return false;
+    }
+
+    if(!tQuery.exec(R"(
+        CREATE INDEX IF NOT EXISTS idx_exercises_name
+        ON exercises(name COLLATE NOCASE)
+    )"))
+    {
+        qCritical() << "Failed to create idx_exercises_name:" << tQuery.lastError().text();
+        return false;
+    }
+
+    if(!tQuery.exec(R"(
+        CREATE INDEX IF NOT EXISTS idx_exercises_muscle_group
+        ON exercises(muscle_group COLLATE NOCASE)
+    )"))
+    {
+        qCritical() << "Failed to create idx_exercises_muscle_group:" << tQuery.lastError().text();
         return false;
     }
 
